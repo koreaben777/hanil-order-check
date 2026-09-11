@@ -1,0 +1,18 @@
+# 접속정보·사내 자료는 절대 올리지 않는다
+.env
+.env.*
+*.env
+INTERNAL.md
+테이블사전.md
+*.csv
+*.xlsx
+
+# 파이썬
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# 로컬
+.DS_Store
+substitute_rules.local.json

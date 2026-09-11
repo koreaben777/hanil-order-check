@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>주문 판단 — 의령공장 1·2호기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --canvas:#0f0f0f; --canvas-deep:#000; --card:#181818; --card-2:#222; --strong:#2a2a2a;
+    --ink:#fff; --body:#a8a8a8; --muted:#888; --muted-soft:#666;
+    --blue:#0007cd; --blue-active:#0005a3; --glow:#1a26ff; --cyan:#00d4ff; --violet:#7b3aed; --ok:#33d17a; --err:#ff4d4d;
+    --line:#222; --line-soft:#1a1a1a; --line-strong:#333;
+    --sans:"abcDiatype",ui-sans-serif,system-ui,-apple-system,"Apple SD Gothic Neo","Pretendard",sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--canvas);color:var(--body);font:400 14px/1.5 var(--sans)}
+  body::before{content:"";position:fixed;inset:-20% 0 auto 0;height:60vh;pointer-events:none;
+    background:radial-gradient(60% 50% at 50% 0%,rgba(26,38,255,.18),transparent 70%)}
+  a{color:var(--cyan);text-decoration:none}
+  .wrap{position:relative;max-width:1200px;margin:0 auto;padding:32px 24px 96px}
+  header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:32px}
+  h1{margin:0;color:var(--ink);font-size:32px;font-weight:500;letter-spacing:-.96px}
+  .cap{font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:360px 1fr;gap:24px;align-items:start}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border-radius:var(--r-xl);padding:24px;border:1px solid var(--line-soft)}
+  .card+.card{margin-top:24px}
+  .card h2{margin:0 0 16px;color:var(--ink);font-size:16px;font-weight:600}
+  label{display:block;margin:12px 0 6px;font-size:13px;color:var(--muted)}
+  label:first-of-type{margin-top:0}
+  input,select,textarea{width:100%;height:40px;padding:0 12px;background:var(--card-2);color:var(--ink);
+    border:1px solid var(--line-strong);border-radius:var(--r-md);font:400 14px var(--sans);outline:none}
+  textarea{height:auto;padding:10px 12px;resize:vertical}
+  input.mono{font-family:var(--mono);font-size:13px;text-transform:uppercase}
+  input:focus,select:focus,textarea:focus{border-color:var(--glow);box-shadow:0 0 0 3px rgba(26,38,255,.25)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:10px 18px;border:0;border-radius:var(--r-md);
+    background:var(--blue);color:#fff;font:500 14px var(--sans);cursor:pointer;white-space:nowrap}
+  .btn:hover{background:var(--blue-active)} .btn:disabled{opacity:.5;cursor:default}
+  .btn.ghost{background:var(--card-2);color:var(--body);border:1px solid var(--line-strong)} .btn.ghost:hover{background:var(--strong)}
+  .actions{display:flex;gap:12px;margin-top:20px}
+  .hint{font-size:13px;color:var(--muted-soft);margin-top:12px}
+  .err{display:none;margin-bottom:24px;padding:12px 16px;border-radius:var(--r-md);background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.4);color:#ffb3b3}
+  .empty{color:var(--muted-soft);padding:48px 0;text-align:center}
+  code,.mono{font-family:var(--mono);font-size:13px}
+  .spec{color:var(--ink);font-size:18px;font-weight:600;margin:4px 0 2px}
+  .sub{color:var(--muted);font-size:13px}
+  .bar{display:flex;height:14px;border-radius:9999px;overflow:hidden;background:var(--card-2);margin:20px 0 12px}
+  .bar span{display:block;height:100%}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .tile{background:var(--card-2);border-radius:var(--r-lg);padding:16px 20px;border-left:3px solid var(--line-strong)}
+  .tile .n{color:var(--ink);font-size:24px;font-weight:500;letter-spacing:-.5px;margin:2px 0}
+  .tile .p{font-size:13px;color:var(--muted)}
+  .stock{background:var(--canvas-deep);border-radius:var(--r-lg);padding:16px 20px;margin-top:16px;display:flex;gap:24px;flex-wrap:wrap}
+  .stock b{color:var(--ink);font-weight:600}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line-strong);color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.88px;text-transform:uppercase}
+  td{padding:9px 10px;border-bottom:1px solid var(--line-soft);color:var(--body);vertical-align:top}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr.alloc td{color:var(--ink);background:rgba(0,212,255,.06)}
+  .badge{display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;letter-spacing:.4px;background:var(--strong);color:var(--body)}
+  .badge.stock{background:rgba(26,38,255,.25);color:#b7bcff} .badge.sub{background:rgba(0,212,255,.15);color:var(--cyan)} .badge.prod{background:rgba(123,58,237,.2);color:#c9b3ff}
+  .badge.ok{background:rgba(51,209,122,.15);color:var(--ok)}
+  .decisions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .rule{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .dim{color:var(--muted-soft)}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:24px} @media (max-width:1200px){.split{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="cap">Order · Stock · Substitute · Production</div>
+      <h1>주문 판단</h1>
+    </div>
+    <div class="sub">의령공장 1·2호기 부직포 · ERP 실시간 조회(읽기 전용) · 이 맥에서만</div>
+  </header>
+
+  <div class="err" id="err"></div>
+
+  <div class="grid">
+    <div>
+      <form class="card" id="f" autocomplete="off">
+        <h2>주문 입력</h2>
+        <label>품목코드 <span class="dim">— 코드 또는 품명 앞글자로 검색</span></label>
+        <input class="mono" id="item" list="items" placeholder="2PD2040NT1N" required>
+        <datalist id="items"></datalist>
+        <div class="row">
+          <div><label>폭 (mm)</label><input type="number" id="width" min="1" placeholder="1070" required></div>
+          <div><label>길이 (m)</label><input type="number" id="length" min="1" placeholder="2000" required></div>
+        </div>
+        <div class="row">
+          <div><label>등급</label>
+            <select id="grade"><option>A</option><option>A0</option><option>A1</option><option>B</option><option>C</option><option>D</option><option>R</option></select></div>
+          <div><label>롤수 <span class="dim">또는 kg</span></label><input type="number" id="rolls" min="1" placeholder="48"></div>
+        </div>
+        <div class="row">
+          <div><label>중량 (kg)</label><input type="number" id="kg" min="0" step="0.1" placeholder="롤수 대신"></div>
+          <div><label>거래처코드 <span class="dim">선택</span></label><input class="mono" id="partner" list="partners" placeholder="코드 또는 거래처명"><datalist id="partners"></datalist></div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="go" type="submit">판단하기</button>
+          <button class="btn ghost" type="button" id="ex">예시 채우기</button>
+        </div>
+        <div class="hint">등급을 비우면 A. 롤수와 kg 를 둘 다 넣으면 롤수 기준. 거래처코드를 넣으면 그 거래처의 대체 기준이 적용됩니다.</div>
+      </form>
+
+      <div class="card" id="rulecard">
+        <h2>거래처 대체 기준</h2>
+        <div class="rule" id="rulenow"><span class="badge">기본</span><span class="sub">폭 +100mm · 같은 품목·등급</span></div>
+        <label>폭 허용 (+mm)</label><input type="number" id="r_width" min="0" placeholder="100">
+        <label>허용 대체 품목코드 <span class="dim">쉼표 구분</span></label><input class="mono" id="r_items" placeholder="2PD2040NT2N, 2PD2040NT4N">
+        <label>허용 대체 등급 <span class="dim">쉼표 구분</span></label><input class="mono" id="r_grades" placeholder="A1">
+        <label>담당자 코멘트</label><textarea id="r_note" rows="2" placeholder="엠보 크기 무관, 폭 +300까지 슬리팅 OK (담당자, 날짜)"></textarea>
+        <div class="actions"><button class="btn" type="button" id="save" disabled>저장 후 다시 판단</button></div>
+        <div class="hint" id="rulehint">거래처코드를 입력하면 그 거래처 기준을 저장할 수 있습니다. 파일: <code>dev/substitute_rules.json</code></div>
+      </div>
+    </div>
+
+    <div id="out"><div class="card"><div class="empty">주문을 입력하고 <b>판단하기</b>를 누르세요.</div></div></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = (n, d = 1) => Number(n).toLocaleString('ko-KR', {maximumFractionDigits: d});
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let rules = {}, last = null;
+
+async function api(path, opt) {
+  const r = await fetch(path, opt), j = await r.json().catch(() => ({error: r.statusText}));
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+function showErr(m) { const e = $('err'); e.style.display = m ? 'block' : 'none'; e.textContent = m || ''; }
+
+// 품목 자동완성
+let t;
+$('item').addEventListener('input', () => {
+  clearTimeout(t); const q = $('item').value.trim(); if (q.length < 2) return;
+  t = setTimeout(async () => {
+    try {
+      const rows = await api('/api/items?q=' + encodeURIComponent(q));
+      $('items').innerHTML = rows.map(r => `<option value="${esc(r.CD_ITEM)}">${esc(r.NM_ITEM)} ${fmt(r.gsm, 0)}g ${esc(r.color)}/${esc(r.tp)}</option>`).join('');
+    } catch (e) { /* 자동완성 실패는 무시 */ }
+  }, 250);
+});
+
+let tp;
+$('partner').addEventListener('input', () => {
+  clearTimeout(tp); const q = $('partner').value.trim(); if (q.length < 2 || /^\d{6,}$/.test(q)) return;
+  tp = setTimeout(async () => {
+    try {
+      const rows = await api('/api/partners?q=' + encodeURIComponent(q));
+      $('partners').innerHTML = rows.map(r => `<option value="${esc(r.CD_PARTNER)}">${esc(r.LN_PARTNER)}</option>`).join('');
+    } catch (e) { /* 자동완성 실패는 무시 */ }
+  }, 250);
+});
+
+// 거래처 기준 패널
+async function loadRules() { try { rules = await api('/api/rules'); } catch (e) { rules = {}; } fillRule(); }
+function ruleFor(p) { const d = {width_plus: 100, items: [], grades: [], note: '', ...(rules.default || {})}; return p && rules[p] ? {...d, ...rules[p]} : d; }
+function fillRule() {
+  const p = $('partner').value.trim(), r = ruleFor(p), own = !!(p && rules[p]);
+  $('rulenow').innerHTML = `<span class="badge ${own ? 'sub' : ''}">${own ? '거래처 ' + esc(p) : '기본'}</span>` +
+    `<span class="sub">폭 +${r.width_plus}mm${r.items.length ? ' · 품목 ' + esc(r.items.join(', ')) : ''}${r.grades.length ? ' · 등급 ' + esc(r.grades.join(', ')) : ''}${r.updated ? ' · ' + esc(r.updated) : ''}</span>`;
+  $('r_width').value = r.width_plus; $('r_items').value = r.items.join(', '); $('r_grades').value = r.grades.join(', '); $('r_note').value = r.note || '';
+  $('save').disabled = !p;
+  $('rulehint').textContent = p ? `저장하면 거래처 ${p} 기준으로 다시 판단합니다.` : '거래처코드를 입력하면 그 거래처 기준을 저장할 수 있습니다.';
+}
+$('partner').addEventListener('input', fillRule);
+$('save').addEventListener('click', async () => {
+  const p = $('partner').value.trim(); if (!p) return;
+  try {
+    showErr('');
+    await api('/api/rules', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({partner: p, width_plus: $('r_width').value || 0, items: $('r_items').value, grades: $('r_grades').value, note: $('r_note').value})});
+    await loadRules();
+    if (last) run();
+  } catch (e) { showErr('기준 저장 실패: ' + e.message); }
+});
+
+// 판단
+$('ex').addEventListener('click', () => { $('item').value = '2PD2040NT1N'; $('width').value = 1070; $('length').value = 2000; $('grade').value = 'A'; $('rolls').value = 48; $('kg').value = ''; });
+$('f').addEventListener('submit', e => { e.preventDefault(); run(); });
+async function run() {
+  const q = new URLSearchParams({item: $('item').value.trim(), width: $('width').value, length: $('length').value, grade: $('grade').value,
+    rolls: $('rolls').value, kg: $('kg').value, partner: $('partner').value.trim()});
+  $('go').disabled = true; $('go').textContent = '조회 중…'; showErr('');
+  try { last = await api('/api/check?' + q); render(last); }
+  catch (e) { showErr(e.message); }
+  finally { $('go').disabled = false; $('go').textContent = '판단하기'; }
+}
+
+function render(r) {
+  const o = r.order, m = r.master, need = r.need_rolls, pct = n => need ? Math.round(n / need * 100) : 0;
+  const seg = (n, c) => n ? `<span style="width:${n / need * 100}%;background:${c}"></span>` : '';
+  const badge = {재고출하: 'stock', 대체검토: 'sub', 생산의뢰: 'prod'};
+  const ruleTxt = `폭 +${r.rule.width_plus}mm${r.rule.items.length ? ' · 품목 ' + esc(r.rule.items.join(', ')) : ''}${r.rule.grades.length ? ' · 등급 ' + esc(r.rule.grades.join(', ')) : ''}${r.rule.note ? ' · ' + esc(r.rule.note) : ''}`;
+  const own = o.partner && rules[o.partner];
+  const subs = r.subs.map(s => `<tr class="${s.alloc ? 'alloc' : ''}"><td><span class="badge">${esc(s.kind)}</span></td><td class="mono">${esc(s.item)}</td>
+      <td class="mono">${s.width}×${s.length} ${esc(s.grade)}</td><td class="num">${s.rolls}</td><td class="num">${s.open_rolls}</td><td class="num">${s.avail}</td>
+      <td class="num">${s.alloc ? '<b style="color:var(--cyan)">' + s.alloc + '</b>' : '<span class="dim">—</span>'}</td></tr>`).join('');
+  const so = r.open_so.map(s => `<tr><td class="mono">${esc(s.NO_SO)}-${s.SEQ_SO}</td><td class="mono">${esc(s.DT_SO)}</td><td class="mono">${esc(s.CD_PARTNER)}</td><td class="num">${fmt(s.QT_SO)}</td><td class="num">${fmt(s.open_kg)}</td></tr>`).join('');
+  const prq = r.prq.map(p => `<tr><td class="mono">${esc(p.NO_PRQ)}</td><td class="mono">${esc(p.DT_DLV)}</td><td class="num">${fmt(p.QT_PRQ)}</td><td class="num">${fmt(p.QT_WORK)}</td><td class="mono">${esc(p.NO_SO) || '<span class="dim">—</span>'}</td></tr>`).join('');
+  $('out').innerHTML = `
+  <div class="card">
+    <div class="cap">주문</div>
+    <div class="spec"><span class="mono">${esc(o.item)}</span> ${esc(m.NM_ITEM)} ${fmt(m.gsm, 0)}g ${esc(m.color)}/${esc(m.tp)}</div>
+    <div class="sub">${o.width}mm × ${o.length}m · 등급 ${esc(o.grade)} · <b style="color:var(--ink)">${need}롤</b> = ${fmt(r.need_kg)} kg (롤당 ${fmt(r.roll_kg)} kg)${o.partner ? ' · 거래처 <span class="mono">' + esc(o.partner) + '</span>' : ''}</div>
+    <div class="decisions">${r.decisions.map(d => `<span class="badge ${badge[d]}">${d}</span>`).join('')}${r.decisions.length === 1 && r.decisions[0] === '재고출하' ? '<span class="badge ok">전량 재고 출하 가능</span>' : ''}</div>
+    <div class="bar">${seg(r.stock_rolls, 'var(--glow)')}${seg(r.sub_rolls, 'var(--cyan)')}${seg(r.prod_rolls, 'var(--violet)')}</div>
+    <div class="tiles">
+      <div class="tile" style="border-color:var(--glow)"><div class="cap">재고출하</div><div class="n">${r.stock_rolls}롤</div><div class="p">${pct(r.stock_rolls)}% · ${fmt(r.stock_rolls * r.roll_kg)} kg</div></div>
+      <div class="tile" style="border-color:var(--cyan)"><div class="cap">대체검토</div><div class="n">${r.sub_rolls}롤</div><div class="p">${pct(r.sub_rolls)}% · 영업 판단</div></div>
+      <div class="tile" style="border-color:var(--violet)"><div class="cap">생산의뢰</div><div class="n">${r.prod_rolls}롤</div><div class="p">${pct(r.prod_rolls)}% · ${fmt(r.prod_rolls * r.roll_kg)} kg</div></div>
+    </div>
+    <div class="stock">
+      <div>현재고 동일규격 <b>${r.onhand_rolls}롤</b> / ${fmt(r.onhand_kg)} kg</div>
+      <div>− 미출하 수주 <b>${r.open_rolls}롤</b> (${r.open_so.length}건)</div>
+      <div>= 가용 <b>${r.avail_rolls}롤</b></div>
+      <div class="dim">원장 ${esc(r.year_start)} 이후 · 창고 3000</div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>대체 후보 <span class="badge ${own ? 'sub' : ''}" style="margin-left:8px">${own ? '거래처 기준' : '기본 기준'}</span></h2>
+    <div class="sub" style="margin-bottom:8px">${ruleTxt} · 같은 길이 · 넓은 폭은 슬리팅 가정 · 같은 품목 → 같은 등급 → 좁은 폭 순 배정</div>
+    ${r.subs.length ? `<table><thead><tr><th>구분</th><th>품목</th><th>규격</th><th class="num">현재고</th><th class="num">미출하</th><th class="num">가용</th><th class="num">배정</th></tr></thead><tbody>${subs}</tbody></table>`
+      : `<div class="empty">기준 안에 대체 가능한 재고가 없습니다.${o.partner ? ' 왼쪽에서 이 거래처의 허용 범위를 넓혀 저장하면 다시 찾습니다.' : ' 거래처코드를 넣고 허용 범위를 저장하면 다시 찾습니다.'}</div>`}
+  </div>
+  <div class="split">
+    <div class="card"><h2>동일규격 미출하 수주</h2>
+      ${so ? `<table><thead><tr><th>수주</th><th>일자</th><th>거래처</th><th class="num">수주 kg</th><th class="num">잔량 kg</th></tr></thead><tbody>${so}</tbody></table>` : '<div class="dim">없음</div>'}</div>
+    <div class="card"><h2>최근 14일 생산요청 <span class="dim" style="font-weight:400;font-size:13px">품목 단위</span></h2>
+      ${prq ? `<table><thead><tr><th>요청번호</th><th>납기</th><th class="num">요청 kg</th><th class="num">작업 kg</th><th>수주</th></tr></thead><tbody>${prq}</tbody></table>` : '<div class="dim">없음</div>'}</div>
+  </div>`;
+}
+loadRules();
+</script>
+</body>
+</html>
