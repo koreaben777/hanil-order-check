@@ -93,7 +93,14 @@ def test_check_with_fake_db():
             assert "거래처 기준" in oc.report(r) and "엠보 무관" in oc.report(r)
             # 다른 거래처는 기본 기준 그대로
             r = oc.check(oc.Order("2PD2040NT1N", 1070, 2000, "A", rolls=48, partner="P2"), today=date(2026, 9, 10), rules_file=p)
-            assert (r["sub_rolls"], r["prod_rolls"]) == (5, 19)
+            assert (r["sub_rolls"], r["prod_rolls"]) == (5, 19) and r["rule_source"] == "기본"
+            # 임시 기준(저장 안 함): 거래처 없이도 폭 +200·등급 A1 적용 → 파일은 그대로
+            r = oc.check(oc.Order("2PD2040NT1N", 1070, 2000, "A", rolls=48), today=date(2026, 9, 10), rules_file=p,
+                         override={"width_plus": 200, "grades": ["a1"], "items": None})
+            assert r["rule_source"] == "임시" and list(r["subs"].kind) == ["폭+30", "폭+180", "등급"]
+            assert (r["stock_rolls"], r["sub_rolls"], r["prod_rolls"]) == (24, 18, 6)
+            assert "P2" not in json.loads(p.read_text()) and json.loads(p.read_text())["P1"]["width_plus"] == 200
+            assert "임시 기준" in oc.report(r)
         r = oc.check(oc.Order("2PD2040NT1N", 1070, 2000, "A", rolls=20), today=date(2026, 9, 10), rules_file=Path(d) / "none.json")
         assert r["decisions"] == ["재고출하"] and r["prod_rolls"] == 0
     finally:

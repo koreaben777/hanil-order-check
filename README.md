@@ -34,11 +34,11 @@ python test_order_check.py                                      # 자가 점검 
 
 ### 웹앱 화면
 
-- 왼쪽 **주문 입력**: 품목코드(코드·품명 자동완성) · 폭 · 길이 · 등급 · 롤수 또는 kg · 거래처(코드·거래처명 자동완성, 선택). "예시 채우기" 버튼으로 예시 주문이 들어간다
+- 왼쪽 **주문 입력**: 품목코드(코드·품명 자동완성) · 폭 · 길이 · 등급 · 롤수·kg(한쪽 입력 시 자동 계산) · 거래처(코드·거래처명 자동완성, 선택). "예시 채우기" 버튼으로 예시 주문이 들어간다
 - 오른쪽 **결과**: 재고출하/대체검토/생산의뢰 배분 막대와 수량·비율, 현재고−미출하=가용, 대체 후보 표(배정 행 강조), 동일규격 미출하 수주, 최근 생산요청
-- 왼쪽 아래 **거래처 대체 기준**: 거래처코드를 넣으면 그 거래처의 폭 허용·허용 품목·허용 등급·코멘트를 저장하고 즉시 다시 판단한다
+- 왼쪽 아래 **거래처 대체 기준**: 폭 허용·허용 품목·허용 등급·코멘트를 적고 **이 주문에만 적용**(저장 없이 임시) 또는 **저장 후 다시 판단**(거래처코드 필요, 파일에 남음)
 
-API(JSON): `GET /api/check?item&width&length&grade&rolls|kg&partner` · `GET /api/items?q=` · `GET /api/partners?q=` · `GET|POST /api/rules`
+API(JSON): `GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&width_plus&items&grades&note]` · `GET /api/items?q=` · `GET /api/partners?q=` · `GET|POST /api/rules`
 
 디자인은 [awesome-design-md](https://github.com/VoltAgent/awesome-design-md) 의 Composio DESIGN.md 를 따랐다.
 

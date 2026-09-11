@@ -83,11 +83,14 @@ def load_rules(path: Path | str | None = None) -> dict:
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 
 
-def rule_for(partner: str | None, rules: dict) -> dict:
-    """기본값 ← rules['default'] ← rules[거래처] 순으로 덮어쓴다."""
+def rule_for(partner: str | None, rules: dict, override: dict | None = None) -> dict:
+    """기본값 ← rules['default'] ← rules[거래처] ← override(이 주문에만 쓰는 임시 기준, 저장 안 함) 순으로 덮어쓴다.
+    override 의 items/grades 는 목록이어야 한다."""
     r = {**DEFAULT_RULE, **rules.get("default", {})}
     if partner and partner in rules:
         r = {**r, **rules[partner]}
+    if override:
+        r = {**r, **{k: v for k, v in override.items() if k in DEFAULT_RULE and v is not None}}
     r["items"] = [i.strip().upper() for i in r["items"]]
     r["grades"] = [g.strip().upper() for g in r["grades"]]
     return r
@@ -175,10 +178,13 @@ def open_prq(item: str, since: str) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # 판단
 # ---------------------------------------------------------------------------
-def check(o: Order, today: date | None = None, rules_file: Path | str | None = None) -> dict:
+def check(o: Order, today: date | None = None, rules_file: Path | str | None = None, override: dict | None = None) -> dict:
+    """override: 이 주문에만 적용하는 임시 대체 기준 {width_plus, items, grades, note} — 파일에 저장하지 않는다."""
     today = today or date.today()
     ys = year_start(today)
-    rule = rule_for(o.partner, load_rules(rules_file))
+    rules = load_rules(rules_file)
+    rule = rule_for(o.partner, rules, override)
+    rule_source = "임시" if override else ("거래처" if o.partner and o.partner in rules else "기본")
 
     m = item_master(o.item)
     if m is None:
@@ -220,7 +226,7 @@ def check(o: Order, today: date | None = None, rules_file: Path | str | None = N
     sub_rolls = int(subs["alloc"].sum())
 
     return dict(
-        order=o, master=m, rule=rule, roll_kg=rk, need_rolls=need_rolls, need_kg=need_kg, year_start=ys,
+        order=o, master=m, rule=rule, rule_source=rule_source, roll_kg=rk, need_rolls=need_rolls, need_kg=need_kg, year_start=ys,
         onhand_rolls=int(exact.rolls.sum()), onhand_kg=float(exact.kg.sum()), open_rolls=int(exact.open_rolls.sum()),
         avail_rolls=exact_avail, open_so=so[(so.item == o.item) & (so.width == o.width) & (so.length == o.length) & (so.grade == o.grade)],
         stock_rolls=stock_rolls, sub_rolls=sub_rolls, prod_rolls=prod_rolls,
@@ -242,7 +248,7 @@ def report(r: dict) -> str:
          f"       재고출하 {pct(r['stock_rolls'])} · 대체검토 {pct(r['sub_rolls'])} · 생산의뢰 {pct(r['prod_rolls'])}"
          + (f" = {r['prod_rolls'] * r['roll_kg']:,.1f} kg" if r["prod_rolls"] else "")]
     s = r["subs"]
-    L.append(f"\n대체 후보 [{'거래처 기준' if o.partner and rule != rule_for(None, {}) else '기본 기준'}: {rule_txt}] 같은 길이, 폭은 슬리팅 가정:"
+    L.append(f"\n대체 후보 [{r['rule_source']} 기준: {rule_txt}] 같은 길이, 폭은 슬리팅 가정:"
              + (" 없음" if s.empty else ""))
     L += [f"  [{x.kind}] {x.item} {x.width}×{x.length} {x.grade}  현재고 {x.rolls} − 미출하 {x.open_rolls} = 가용 {x.avail}롤"
           + (f"  → 배정 {x.alloc}롤" if x.alloc else "") for x in s.itertuples()]

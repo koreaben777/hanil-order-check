@@ -2,7 +2,7 @@
 
     ../DB조회도구/.venv/bin/python app.py        →  http://127.0.0.1:8765
 
-API (JSON):  GET /api/check?item&width&length&grade&rolls|kg&partner   GET /api/items?q=   GET /api/partners?q=   GET|POST /api/rules
+API (JSON):  GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&width_plus&items&grades&note]   GET /api/items?q=   GET /api/partners?q=   GET|POST /api/rules
 """
 from __future__ import annotations
 
@@ -65,6 +65,25 @@ def _list(v) -> list[str]:
     return [str(x).strip() for x in (v or []) if str(x).strip()]
 
 
+def parse_rule_fields(src: dict) -> dict:
+    """폼/쿼리에서 온 대체 기준을 검증해 {width_plus, items, grades, note} 로 만든다."""
+    fields = {}
+    if src.get("width_plus") not in (None, ""):
+        fields["width_plus"] = int(src["width_plus"])
+        if fields["width_plus"] < 0:
+            raise ValueError("폭 허용(width_plus)은 0 이상이어야 합니다.")
+    if "items" in src:
+        fields["items"] = [i.upper() for i in _list(src["items"])]
+    if "grades" in src:
+        fields["grades"] = [g.upper() for g in _list(src["grades"])]
+        bad = set(fields["grades"]) - set(oc.GRADES)
+        if bad:
+            raise ValueError(f"등급 {sorted(bad)} 은 허용 목록 {oc.GRADES} 에 없습니다.")
+    if "note" in src:
+        fields["note"] = str(src["note"]).strip()
+    return fields
+
+
 class Handler(BaseHTTPRequestHandler):
     def _send(self, code: int, body, ctype="application/json; charset=utf-8"):
         data = body if isinstance(body, bytes) else json.dumps(body, ensure_ascii=False).encode("utf-8")
@@ -84,7 +103,8 @@ class Handler(BaseHTTPRequestHandler):
                 o = oc.Order(q["item"], int(q["width"]), int(q["length"]), q.get("grade") or "A",
                              int(q["rolls"]) if q.get("rolls") else None, float(q["kg"]) if q.get("kg") else None,
                              q.get("partner", "").strip() or None)
-                return self._send(200, jsonable(oc.check(o)))
+                override = parse_rule_fields(q) if q.get("temp") == "1" else None   # 이 주문에만 쓰는 임시 기준
+                return self._send(200, jsonable(oc.check(o, override=override)))
             if u.path == "/api/items":
                 return self._send(200, jsonable(search_items(q.get("q", ""))) if q.get("q") else [])
             if u.path == "/api/partners":
@@ -106,21 +126,7 @@ class Handler(BaseHTTPRequestHandler):
             partner = str(body.get("partner", "")).strip()
             if not partner:
                 raise ValueError("거래처코드가 필요합니다.")
-            fields = {}
-            if "width_plus" in body:
-                fields["width_plus"] = int(body["width_plus"])
-                if fields["width_plus"] < 0:
-                    raise ValueError("width_plus 는 0 이상이어야 합니다.")
-            if "items" in body:
-                fields["items"] = [i.upper() for i in _list(body["items"])]
-            if "grades" in body:
-                fields["grades"] = [g.upper() for g in _list(body["grades"])]
-                bad = set(fields["grades"]) - set(oc.GRADES)
-                if bad:
-                    raise ValueError(f"등급 {sorted(bad)} 은 허용 목록 {oc.GRADES} 에 없습니다.")
-            if "note" in body:
-                fields["note"] = str(body["note"]).strip()
-            self._send(200, oc.set_rule(partner, **fields))
+            self._send(200, oc.set_rule(partner, **parse_rule_fields(body)))
         except (ValueError, KeyError, TypeError) as e:
             self._send(400, {"error": str(e)})
         except Exception as e:
