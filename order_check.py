@@ -6,8 +6,8 @@
     ../DB조회도구/.venv/bin/python order_check.py 2PD2040NT1N -w 1070 -l 2000 -g A -r 48
     ../DB조회도구/.venv/bin/python order_check.py 2PD2040NT1N -w 1070 -l 2000 --kg 4108.8 --partner 거래처코드
 
-대체 기준: 기본은 "같은 품목·길이·등급, 폭 +100mm 까지(슬리팅)". 거래처별 허용 범위는 `substitute_rules.json` 에
-영업담당자가 적는다 — set_rule("거래처코드", width_plus=200, items=["2PD2030WH1N"], grades=["A1"], note="…").
+대체 기준: 기본은 "같은 품목·등급, 폭 +200mm · 길이 +200m 까지(슬리팅·재단 가정)". 거래처별 허용 범위는 `substitute_rules.json` 에
+영업담당자가 적는다 — set_rule("거래처코드", width_plus=300, length_plus=500, items=["2PD2030WH1N"], grades=["A1"], note="…").
 """
 from __future__ import annotations
 
@@ -15,6 +15,7 @@ import argparse
 import json
 import math
 import os
+import re
 import sys
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -31,7 +32,7 @@ GRADES = ("A", "A0", "A1", "B", "C", "D", "R")
 MACHINES = ("1", "2")                                # 품목코드 첫 자리: 1호기 PET/PLA · 2호기 PP
 SPEC = ["item", "width", "length", "grade"]
 RULES_FILE = Path(__file__).with_name("substitute_rules.json")
-DEFAULT_RULE = {"width_plus": 100, "items": [], "grades": [], "note": ""}
+DEFAULT_RULE = {"width_plus": 200, "length_plus": 200, "items": [], "grades": [], "note": ""}   # 폭 mm · 길이 m
 
 
 @dataclass
@@ -45,8 +46,11 @@ class Order:
     partner: str | None = None   # 거래처코드(CD_PARTNER) — 거래처별 대체 기준 적용
 
     def __post_init__(self):
+        raw = self.item
         self.item = self.item.strip().upper()
         self.grade = (self.grade or "A").strip().upper()
+        if not re.fullmatch(r"[0-9A-Z_]+", self.item):
+            raise ValueError(f"품목코드에 허용되지 않는 문자가 있습니다: {raw!r} ({len(raw)}자). 영문·숫자·밑줄만 가능합니다.")
         if self.item[:1] not in MACHINES:
             raise ValueError(f"{self.item}: 1·2호기 품목(코드 첫 자리 1/2)만 지원합니다.")
         if self.width <= 0 or self.length <= 0:
@@ -98,7 +102,7 @@ def rule_for(partner: str | None, rules: dict, override: dict | None = None) -> 
 
 def set_rule(partner: str, path: Path | str | None = None, **fields) -> dict:
     """영업담당자가 정해진 폼으로 적은 허용 범위를 저장한다.
-    fields: width_plus(mm) · items(허용 대체 품목코드 목록) · grades(허용 대체 등급 목록) · note(코멘트)."""
+    fields: width_plus(mm) · length_plus(m) · items(허용 대체 품목코드 목록) · grades(허용 대체 등급 목록) · note(코멘트)."""
     bad = set(fields) - set(DEFAULT_RULE)
     if bad:
         raise ValueError(f"알 수 없는 기준: {sorted(bad)} (허용: {sorted(DEFAULT_RULE)})")
@@ -135,7 +139,13 @@ def _in(items: list[str]) -> tuple[str, dict]:
 
 
 def onhand(items: list[str], ys: str) -> pd.DataFrame:
-    """MM_QTIOLOT 합산 — 품목·폭·길이·등급별 잔량>0 인 LOT 수(롤)와 kg. ERP 수주화면 현재고와 같은 기준."""
+    """MM_QTIOLOT 합산 — 품목·폭·길이·등급별 잔량>0 인 LOT 수(롤)와 kg. ERP 수주화면 현재고와 같은 기준.
+
+    MM_QTIOLOT 은 MM_QTIO 의 LOT 분해 상세이지 별도 원장이 아니다. 둘을 더하면 이중계상된다
+    (2026-09-11 확인: 품목 1TD2018NT1C 2026년 입고가 양쪽 모두 361,155.1800 으로 동일).
+    롤 수는 LOT 단위라 MM_QTIOLOT 로만 셀 수 있고, 금액·수량 누계만 필요하면 MM_PINVN
+    (P_YR 연도별 기초+입고-출고, MM_QTIO 누계와 일치)을 쓰는 편이 가볍다.
+    """
     sql_in, ph = _in(items)
     df = db.query(f"""
         WITH bal AS (
@@ -167,9 +177,14 @@ def open_so(items: list[str], since: str) -> pd.DataFrame:
 
 
 def open_prq(item: str, since: str) -> pd.DataFrame:
-    """최근 생산요청 라인 (규격 컬럼이 비어 있어 품목 단위로만 본다). 이미 요청돼 있으면 중복 의뢰를 피한다."""
+    """최근 생산요청 라인 (규격 컬럼이 비어 있어 품목 단위로만 본다). 이미 요청돼 있으면 중복 의뢰를 피한다.
+
+    PR_PRQL.NO_SO 는 조회하지 않는다 — 2020년 이후 채움 0건이라 수주 역추적에 쓸 수 없다
+    (2026-09-11 확인: 2018년 225/557, 2019년 603/3750, 2020년 2/4556, 2021~2026년 0).
+    PR_WO.NO_SO · PR_PRQ_WO_LINK.NO_SO 도 같은 기간 전부 0건이라 대체 경로가 아니다.
+    """
     return db.query("""
-        SELECT NO_PRQ, DT_DLV, QT_PRQ, QT_ITEM AS qt_wo, QT_WORK, NO_SO
+        SELECT NO_PRQ, DT_DLV, QT_PRQ, QT_ITEM AS qt_wo, QT_WORK
         FROM NEOE.PR_PRQL
         WHERE CD_COMPANY=:c AND CD_PLANT=:p AND CD_ITEM=:item AND DT_DLV >= :since
         ORDER BY DT_DLV DESC""", c=COMPANY, p=PLANT, item=item, since=since)
@@ -179,7 +194,7 @@ def open_prq(item: str, since: str) -> pd.DataFrame:
 # 판단
 # ---------------------------------------------------------------------------
 def check(o: Order, today: date | None = None, rules_file: Path | str | None = None, override: dict | None = None) -> dict:
-    """override: 이 주문에만 적용하는 임시 대체 기준 {width_plus, items, grades, note} — 파일에 저장하지 않는다."""
+    """override: 이 주문에만 적용하는 임시 대체 기준 {width_plus, length_plus, items, grades, note} — 파일에 저장하지 않는다."""
     today = today or date.today()
     ys = year_start(today)
     rules = load_rules(rules_file)
@@ -188,7 +203,7 @@ def check(o: Order, today: date | None = None, rules_file: Path | str | None = N
 
     m = item_master(o.item)
     if m is None:
-        raise ValueError(f"{o.item}: MA_PITEM(의령)에 없는 품목")
+        raise ValueError(f"{o.item!r}({len(o.item)}자): MA_PITEM(의령 3000)에 없는 품목코드입니다. 자동완성 목록에서 고르거나 코드 전체(11자)를 확인하세요.")
     if m["CLS_ITEM"] != "003":
         raise ValueError(f"{o.item}: 제품(003)이 아님 (CLS_ITEM={m['CLS_ITEM']})")
     gsm = float(m["gsm"] or 0)
@@ -210,16 +225,19 @@ def check(o: Order, today: date | None = None, rules_file: Path | str | None = N
     stock["open_rolls"] = stock.open_rolls.apply(math.ceil)
     stock["avail"] = (stock.rolls - stock.open_rolls).clip(lower=0)
 
-    # 후보 풀: 허용 품목·등급, 같은 길이, 폭 [주문, 주문+width_plus] (넓은 폭은 슬리팅 가정)
-    pool = stock[stock.item.isin(items) & stock.grade.isin(grades) & (stock.length == o.length)
-                 & (stock.width >= o.width) & (stock.width <= o.width + rule["width_plus"])]
-    is_exact = (pool.item == o.item) & (pool.width == o.width) & (pool.grade == o.grade)
+    # 후보 풀: 허용 품목·등급, 폭 [주문, 주문+width_plus] · 길이 [주문, 주문+length_plus] (넓은 폭은 슬리팅, 긴 길이는 재단 가정)
+    pool = stock[stock.item.isin(items) & stock.grade.isin(grades)
+                 & (stock.width >= o.width) & (stock.width <= o.width + rule["width_plus"])
+                 & (stock.length >= o.length) & (stock.length <= o.length + rule["length_plus"])]
+    is_exact = (pool.item == o.item) & (pool.width == o.width) & (pool.length == o.length) & (pool.grade == o.grade)
     exact = pool[is_exact]
     subs = pool[~is_exact].copy()
     subs["kind"] = ["·".join(k for k, on in (("품목", r.item != o.item), ("등급", r.grade != o.grade),
-                                              (f"폭+{r.width - o.width}", r.width > o.width)) if on)
+                                              (f"폭+{r.width - o.width}", r.width > o.width),
+                                              (f"길이+{r.length - o.length}", r.length > o.length)) if on)
                     for r in subs.itertuples()]
-    subs = subs.assign(_i=subs.item != o.item, _g=subs.grade != o.grade).sort_values(["_i", "_g", "width"]).drop(columns=["_i", "_g"])
+    # 배정 순서: 같은 품목 → 같은 등급 → 좁은 폭 → 짧은 길이 (손실 적은 것부터)
+    subs = subs.assign(_i=subs.item != o.item, _g=subs.grade != o.grade).sort_values(["_i", "_g", "width", "length"]).drop(columns=["_i", "_g"])
     exact_avail = int(exact.avail.sum())
     stock_rolls, taken, prod_rolls = allocate(need_rolls, exact_avail, [(r.Index, int(r.avail)) for r in subs.itertuples()])
     subs["alloc"] = pd.Series(dict(taken)).reindex(subs.index).fillna(0).astype(int)
@@ -238,7 +256,7 @@ def check(o: Order, today: date | None = None, rules_file: Path | str | None = N
 def report(r: dict) -> str:
     o, m, need, rule = r["order"], r["master"], r["need_rolls"], r["rule"]
     pct = lambda n: f"{n}롤 ({n / need:.0%})"
-    rule_txt = f"폭 +{rule['width_plus']}mm" + (f" · 품목 {','.join(rule['items'])}" if rule["items"] else "") \
+    rule_txt = f"폭 +{rule['width_plus']}mm · 길이 +{rule['length_plus']}m" + (f" · 품목 {','.join(rule['items'])}" if rule["items"] else "") \
         + (f" · 등급 {','.join(rule['grades'])}" if rule["grades"] else "") + (f" · 비고 {rule['note']}" if rule["note"] else "")
     L = [f"주문   {o.item} {m['NM_ITEM']} {float(m['gsm']):g}g {m['color']}/{m['tp']} | {o.width}mm × {o.length}m | {o.grade} | "
          f"{need}롤 = {r['need_kg']:,.1f} kg (롤당 {r['roll_kg']:.1f} kg)" + (f" | 거래처 {o.partner}" if o.partner else ""),
@@ -248,7 +266,7 @@ def report(r: dict) -> str:
          f"       재고출하 {pct(r['stock_rolls'])} · 대체검토 {pct(r['sub_rolls'])} · 생산의뢰 {pct(r['prod_rolls'])}"
          + (f" = {r['prod_rolls'] * r['roll_kg']:,.1f} kg" if r["prod_rolls"] else "")]
     s = r["subs"]
-    L.append(f"\n대체 후보 [{r['rule_source']} 기준: {rule_txt}] 같은 길이, 폭은 슬리팅 가정:"
+    L.append(f"\n대체 후보 [{r['rule_source']} 기준: {rule_txt}] 넓은 폭은 슬리팅·긴 길이는 재단 가정:"
              + (" 없음" if s.empty else ""))
     L += [f"  [{x.kind}] {x.item} {x.width}×{x.length} {x.grade}  현재고 {x.rolls} − 미출하 {x.open_rolls} = 가용 {x.avail}롤"
           + (f"  → 배정 {x.alloc}롤" if x.alloc else "") for x in s.itertuples()]

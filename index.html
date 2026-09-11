@@ -114,8 +114,11 @@
 
       <div class="card" id="rulecard">
         <h2>거래처 대체 기준</h2>
-        <div class="rule" id="rulenow"><span class="badge">기본</span><span class="sub">폭 +100mm · 같은 품목·등급</span></div>
-        <label>폭 허용 (+mm)</label><input type="number" id="r_width" min="0" placeholder="100">
+        <div class="rule" id="rulenow"><span class="badge">기본</span><span class="sub">폭 +200mm · 길이 +200m · 같은 품목·등급</span></div>
+        <div class="row">
+          <div><label>폭 허용 (+mm)</label><input type="number" id="r_width" min="0" placeholder="200"></div>
+          <div><label>길이 허용 (+m)</label><input type="number" id="r_length" min="0" placeholder="200"></div>
+        </div>
         <label>허용 대체 품목코드 <span class="dim">쉼표 구분</span></label><input class="mono" id="r_items" placeholder="2PD2040NT2N, 2PD2040NT4N">
         <label>허용 대체 등급 <span class="dim">쉼표 구분</span></label><input class="mono" id="r_grades" placeholder="A1">
         <label>담당자 코멘트</label><textarea id="r_note" rows="2" placeholder="엠보 크기 무관, 폭 +300까지 슬리팅 OK (담당자, 날짜)"></textarea>
@@ -135,6 +138,7 @@
 const $ = id => document.getElementById(id);
 const fmt = (n, d = 1) => Number(n).toLocaleString('ko-KR', {maximumFractionDigits: d});
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cleanCode = v => v.normalize('NFKC').toUpperCase().replace(/[^0-9A-Z_]/g, '');   // 전각·공백·보이지 않는 문자 제거
 let rules = {}, last = null;
 
 async function api(path, opt) {
@@ -147,7 +151,8 @@ function showErr(m) { const e = $('err'); e.style.display = m ? 'block' : 'none'
 // 품목 자동완성
 let t;
 $('item').addEventListener('input', () => {
-  clearTimeout(t); const q = $('item').value.trim(); if (q.length < 2) return;
+  const c = cleanCode($('item').value); if (c !== $('item').value) $('item').value = c;
+  clearTimeout(t); const q = c; if (q.length < 2) return;
   t = setTimeout(async () => {
     try {
       const rows = await api('/api/items?q=' + encodeURIComponent(q));
@@ -172,7 +177,7 @@ $('partner').addEventListener('input', () => {
 let gsm = null, gsmItem = '', lastEdited = 'rolls';
 const codeGsm = code => { const m = /^[12][A-Z]{2}\d(\d{3})/.exec(code); return m ? parseInt(m[1], 10) : null; };
 async function resolveGsm() {
-  const code = $('item').value.trim().toUpperCase();
+  const code = cleanCode($('item').value); $('item').value = code;
   if (code === gsmItem) return;
   gsmItem = code; gsm = codeGsm(code);
   if (code.length >= 8) {
@@ -194,12 +199,13 @@ $('item').addEventListener('change', async () => { await resolveGsm(); syncQty()
 
 // 거래처 기준 패널
 async function loadRules() { try { rules = await api('/api/rules'); } catch (e) { rules = {}; } fillRule(); }
-function ruleFor(p) { const d = {width_plus: 100, items: [], grades: [], note: '', ...(rules.default || {})}; return p && rules[p] ? {...d, ...rules[p]} : d; }
+function ruleFor(p) { const d = {width_plus: 200, length_plus: 200, items: [], grades: [], note: '', ...(rules.default || {})}; return p && rules[p] ? {...d, ...rules[p]} : d; }
+const ruleText = r => `폭 +${r.width_plus}mm · 길이 +${r.length_plus}m${r.items.length ? ' · 품목 ' + esc(r.items.join(', ')) : ''}${r.grades.length ? ' · 등급 ' + esc(r.grades.join(', ')) : ''}`;
 function fillRule() {
   const p = $('partner').value.trim(), r = ruleFor(p), own = !!(p && rules[p]);
   $('rulenow').innerHTML = `<span class="badge ${own ? 'b-sub' : ''}">${own ? '거래처 ' + esc(p) : '기본'}</span>` +
-    `<span class="sub">폭 +${r.width_plus}mm${r.items.length ? ' · 품목 ' + esc(r.items.join(', ')) : ''}${r.grades.length ? ' · 등급 ' + esc(r.grades.join(', ')) : ''}${r.updated ? ' · ' + esc(r.updated) : ''}</span>`;
-  $('r_width').value = r.width_plus; $('r_items').value = r.items.join(', '); $('r_grades').value = r.grades.join(', '); $('r_note').value = r.note || '';
+    `<span class="sub">${ruleText(r)}${r.updated ? ' · ' + esc(r.updated) : ''}</span>`;
+  $('r_width').value = r.width_plus; $('r_length').value = r.length_plus; $('r_items').value = r.items.join(', '); $('r_grades').value = r.grades.join(', '); $('r_note').value = r.note || '';
   $('save').disabled = !p;
   $('rulehint').textContent = (p ? `저장하면 거래처 ${p} 기준으로 파일(substitute_rules.json)에 남기고 다시 판단합니다. ` : '저장은 거래처코드가 있어야 합니다(기준이 거래처별로 저장됨). ')
     + '"이 주문에만 적용"은 저장 없이 위 값으로 지금 주문만 다시 판단합니다.';
@@ -210,7 +216,7 @@ $('save').addEventListener('click', async () => {
   try {
     showErr('');
     await api('/api/rules', {method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({partner: p, width_plus: $('r_width').value || 0, items: $('r_items').value, grades: $('r_grades').value, note: $('r_note').value})});
+      body: JSON.stringify({partner: p, width_plus: $('r_width').value || 0, length_plus: $('r_length').value || 0, items: $('r_items').value, grades: $('r_grades').value, note: $('r_note').value})});
     await loadRules();
     if (last) run();
   } catch (e) { showErr('기준 저장 실패: ' + e.message); }
@@ -221,9 +227,9 @@ $('ex').addEventListener('click', async () => { $('item').value = '2PD2040NT1N';
 $('f').addEventListener('submit', e => { e.preventDefault(); run(); });
 $('temp').addEventListener('click', () => { if ($('f').reportValidity()) run(true); });
 async function run(temp = false) {
-  const q = new URLSearchParams({item: $('item').value.trim(), width: $('width').value, length: $('length').value, grade: $('grade').value,
+  const q = new URLSearchParams({item: cleanCode($('item').value), width: $('width').value, length: $('length').value, grade: $('grade').value,
     rolls: lastEdited === 'rolls' ? $('rolls').value : '', kg: lastEdited === 'kg' ? $('kg').value : '', partner: $('partner').value.trim()});
-  if (temp) { q.set('temp', '1'); q.set('width_plus', $('r_width').value); q.set('items', $('r_items').value); q.set('grades', $('r_grades').value); q.set('note', $('r_note').value); }
+  if (temp) { q.set('temp', '1'); q.set('width_plus', $('r_width').value); q.set('length_plus', $('r_length').value); q.set('items', $('r_items').value); q.set('grades', $('r_grades').value); q.set('note', $('r_note').value); }
   $('go').disabled = true; $('go').textContent = '조회 중…'; showErr('');
   try { last = await api('/api/check?' + q); render(last); }
   catch (e) { showErr(e.message); }
@@ -234,7 +240,7 @@ function render(r) {
   const o = r.order, m = r.master, need = r.need_rolls, pct = n => need ? Math.round(n / need * 100) : 0;
   const seg = (n, c) => n ? `<span style="width:${n / need * 100}%;background:${c}"></span>` : '';
   const badge = {재고출하: 'b-stock', 대체검토: 'b-sub', 생산의뢰: 'b-prod'};
-  const ruleTxt = `폭 +${r.rule.width_plus}mm${r.rule.items.length ? ' · 품목 ' + esc(r.rule.items.join(', ')) : ''}${r.rule.grades.length ? ' · 등급 ' + esc(r.rule.grades.join(', ')) : ''}${r.rule.note ? ' · ' + esc(r.rule.note) : ''}`;
+  const ruleTxt = ruleText(r.rule) + (r.rule.note ? ' · ' + esc(r.rule.note) : '');
   const subs = r.subs.map(s => `<tr class="${s.alloc ? 'alloc' : ''}"><td><span class="badge">${esc(s.kind)}</span></td><td class="mono">${esc(s.item)}</td>
       <td class="mono">${s.width}×${s.length} ${esc(s.grade)}</td><td class="num">${s.rolls}</td><td class="num">${s.open_rolls}</td><td class="num">${s.avail}</td>
       <td class="num">${s.alloc ? '<b style="color:var(--cyan)">' + s.alloc + '</b>' : '<span class="dim">—</span>'}</td></tr>`).join('');
@@ -261,7 +267,7 @@ function render(r) {
   </div>
   <div class="card">
     <h2>대체 후보 <span class="badge ${{임시: 'b-temp', 거래처: 'b-sub'}[r.rule_source] || ''}" style="margin-left:8px">${esc(r.rule_source)} 기준${r.rule_source === '임시' ? ' · 저장 안 됨' : ''}</span></h2>
-    <div class="sub" style="margin-bottom:8px">${ruleTxt} · 같은 길이 · 넓은 폭은 슬리팅 가정 · 같은 품목 → 같은 등급 → 좁은 폭 순 배정</div>
+    <div class="sub" style="margin-bottom:8px">${ruleTxt} · 넓은 폭은 슬리팅, 긴 길이는 재단 가정 · 같은 품목 → 같은 등급 → 좁은 폭 → 짧은 길이 순 배정</div>
     ${r.subs.length ? `<table><thead><tr><th>구분</th><th>품목</th><th>규격</th><th class="num">현재고</th><th class="num">미출하</th><th class="num">가용</th><th class="num">배정</th></tr></thead><tbody>${subs}</tbody></table>`
       : `<div class="empty">기준 안에 대체 가능한 재고가 없습니다.${o.partner ? ' 왼쪽에서 이 거래처의 허용 범위를 넓혀 저장하면 다시 찾습니다.' : ' 거래처코드를 넣고 허용 범위를 저장하면 다시 찾습니다.'}</div>`}
   </div>

@@ -12,33 +12,44 @@
 | `test_order_check.py` | DB 없이 도는 자가 점검 |
 | `TESTING.md` | 실행 방법과 기능 테스트용 입력값 |
 
-## 준비
+## 준비 — 반드시 hhhs-db-manager 가 설치된 파이썬으로 실행한다
 
-1. 팀 공용 ERP 조회 도구 **hhhs-db-manager** 가 필요하다(`hhhs_db_manager.py` + `.env`). 아래 중 하나:
-   - 그 저장소를 `pip install -e <경로>` 로 설치한 파이썬 환경을 쓴다 (권장), 또는
-   - 환경변수 `HHHS_DB_DIR=<hhhs_db_manager.py 가 있는 폴더>` 를 지정한다, 또는
-   - 이 저장소를 `DB조회도구/` 폴더 **옆에** `dev/` 로 둔다 (기본 탐색 경로).
-2. `.env`(접속정보)는 hhhs-db-manager 폴더에만 둔다. **이 저장소에는 절대 커밋하지 않는다** (`.gitignore` 로 막아 둠).
-3. 파이썬 3.10+, 의존성은 hhhs-db-manager 의 것(pandas · SQLAlchemy · pymssql · python-dotenv)뿐이다.
+이 앱은 ERP 조회를 팀 공용 도구 **hhhs-db-manager**(`hhhs_db_manager.py` + `.env`)에 맡긴다. 그 도구의 의존성(**pymssql**, SQLAlchemy, pandas, python-dotenv)이
+들어 있는 파이썬으로 띄워야 한다. 터미널에서 그냥 `python app.py` 를 치면 맥 기본 파이썬(anaconda·시스템)이 잡히는데, 거기에는 보통 pymssql 이 없다.
+그러면 **서버는 정상으로 뜨고 화면도 열리지만, "판단하기"를 누르는 첫 조회에서 `ModuleNotFoundError: No module named 'pymssql'` 가 난다.**
+
+| 방법 | 언제 | 실행 파이썬 |
+| --- | --- | --- |
+| A. 팀 작업 사본의 가상환경 사용 (권장) | `DB조회도구/`(hhhs-db-manager 작업 사본) 옆에 이 저장소를 `dev/` 로 둔 경우 | `../DB조회도구/.venv/bin/python` |
+| B. 다른 위치의 hhhs-db-manager 사용 | 저장소를 아무 곳에나 클론한 경우 | 그 도구의 venv 파이썬 + `HHHS_DB_DIR=<hhhs_db_manager.py 폴더>` |
+| C. 내 파이썬에 도구를 설치 | anaconda 등 평소 쓰는 파이썬으로 띄우고 싶을 때 | `pip install -e <hhhs-db-manager 폴더>` 후 그 `python` |
+
+- `.env`(접속정보)는 hhhs-db-manager 폴더에만 둔다. **이 저장소에는 절대 커밋하지 않는다** (`.gitignore` 로 막아 둠).
+- 파이썬 3.10+. 이 저장소 자체는 의존성을 추가하지 않는다.
+- 접속·권한 자가점검: `<venv>/bin/hhhs-db check`
 
 ## 실행
 
+경로는 자기 환경에 맞게 바꾼다(아래는 방법 A, 저장소가 `~/Documents/Eugene_Group/한일합섬/dev` 에 있을 때).
+
 ```bash
-python app.py                                                   # 웹앱 → http://127.0.0.1:8765  (Ctrl+C 종료)
-python order_check.py 2PD2040NT1N -w 1070 -l 2000 -g A -r 48    # CLI
-python order_check.py 2PD2040NT1N -w 1070 -l 2000 --kg 4108.8 --partner 거래처코드
-python test_order_check.py                                      # 자가 점검 (DB 불필요)
+cd ~/Documents/Eugene_Group/한일합섬/dev
+../DB조회도구/.venv/bin/python app.py                                                   # 웹앱 → http://127.0.0.1:8765  (Ctrl+C 종료)
+../DB조회도구/.venv/bin/python order_check.py 2PD2040NT1N -w 1070 -l 2000 -g A -r 48    # CLI
+../DB조회도구/.venv/bin/python order_check.py 2PD2040NT1N -w 1070 -l 2000 --kg 4108.8 --partner 거래처코드
+../DB조회도구/.venv/bin/python test_order_check.py                                      # 자가 점검 (DB 불필요)
 ```
 
-`python` 은 hhhs-db-manager 가 설치된 환경의 것(예: `../DB조회도구/.venv/bin/python`). 상세와 테스트 입력값은 `TESTING.md`.
+복사해서 바로 쓸 수 있는 명령 모음과 테스트 입력값은 `TESTING.md`.
+Claude 앱의 브라우저 패널에서는 프로젝트 루트 `.claude/launch.json` 의 `order-check` 설정으로 띄운다.
 
 ### 웹앱 화면
 
 - 왼쪽 **주문 입력**: 품목코드(코드·품명 자동완성) · 폭 · 길이 · 등급 · 롤수·kg(한쪽 입력 시 자동 계산) · 거래처(코드·거래처명 자동완성, 선택). "예시 채우기" 버튼으로 예시 주문이 들어간다
 - 오른쪽 **결과**: 재고출하/대체검토/생산의뢰 배분 막대와 수량·비율, 현재고−미출하=가용, 대체 후보 표(배정 행 강조), 동일규격 미출하 수주, 최근 생산요청
-- 왼쪽 아래 **거래처 대체 기준**: 폭 허용·허용 품목·허용 등급·코멘트를 적고 **이 주문에만 적용**(저장 없이 임시) 또는 **저장 후 다시 판단**(거래처코드 필요, 파일에 남음)
+- 왼쪽 아래 **거래처 대체 기준**: 폭 허용·길이 허용·허용 품목·허용 등급·코멘트를 적고 **이 주문에만 적용**(저장 없이 임시) 또는 **저장 후 다시 판단**(거래처코드 필요, 파일에 남음)
 
-API(JSON): `GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&width_plus&items&grades&note]` · `GET /api/items?q=` · `GET /api/partners?q=` · `GET|POST /api/rules`
+API(JSON): `GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&width_plus&length_plus&items&grades&note]` · `GET /api/items?q=` · `GET /api/partners?q=` · `GET|POST /api/rules`
 
 디자인은 [awesome-design-md](https://github.com/VoltAgent/awesome-design-md) 의 Composio DESIGN.md 를 따랐다.
 
@@ -49,17 +60,17 @@ API(JSON): `GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&widt
 | 품목 | `MA_PITEM` | 제품(003)만. 평량·색상·기능(`CD_USERDEF3`)으로 롤당 kg = 폭(m)×길이(m)×평량÷1000 |
 | 현재고 | `MM_QTIOLOT` | 의령(3000)·SB창고(3000)·올해 기초+수불 합산, 품목·폭·길이·등급별 잔량>0 LOT 수 = 롤수 |
 | 가용 | `SA_SOL`+`SA_SOH` | 규격별 미출하 수주(QT_SO>QT_GI, STA_SO='R', 올해) 롤수를 차감. 대체 후보 규격에도 같은 차감 적용 |
-| 대체 후보 | 위 재고 | 같은 길이, 폭 [주문, 주문+width_plus] (넓은 폭은 슬리팅 가정). 기본은 같은 품목·등급, 폭 +100mm 만. 거래처 기준으로 허용 품목·등급을 넓힌다. 같은 품목 → 같은 등급 → 좁은 폭 순으로 배정 |
+| 대체 후보 | 위 재고 | 폭 [주문, 주문+width_plus] · 길이 [주문, 주문+length_plus] (넓은 폭은 슬리팅, 긴 길이는 재단 가정). 기본은 같은 품목·등급, 폭 +200mm · 길이 +200m. 거래처 기준으로 허용 범위·품목·등급을 넓힌다. 같은 품목 → 같은 등급 → 좁은 폭 → 짧은 길이 순으로 배정 |
 | 생산 | `PR_PRQL` | 최근 14일 생산요청(품목 단위 — 규격 컬럼이 비어 있음) 참고 표시 |
 
 ```
 재고출하 = min(동일규격 가용롤, 주문롤)
-대체검토 = 남은 롤을 대체 후보(가용롤)에서 좁은 폭부터 순서대로 배정
+대체검토 = 남은 롤을 대체 후보(가용롤)에서 손실 적은 순(같은 품목 → 같은 등급 → 좁은 폭 → 짧은 길이)으로 배정
 생산의뢰 = 그래도 남는 롤
 판단 = 배정 수량이 0 보다 큰 경로만 나열
 ```
 
-폭 허용오차·두께 등 기타 스펙 조건은 보류(동일규격 = 폭 정확 일치). 기능(항균 등)이 다른 품목은 자동 후보에 넣지 않는다 — 거래처 기준의 `items` 에 명시했을 때만.
+두께 등 기타 스펙 조건은 보류(동일규격 = 품목·폭·길이·등급 정확 일치). 기능(항균 등)이 다른 품목은 자동 후보에 넣지 않는다 — 거래처 기준의 `items` 에 명시했을 때만.
 
 ## 거래처별 대체 기준 — `substitute_rules.json`
 
@@ -67,19 +78,20 @@ API(JSON): `GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&widt
 
 ```json
 {
-  "default": {"width_plus": 100},
-  "P0001": {"width_plus": 300, "items": ["2PD2030WH1N"], "grades": ["A1"], "note": "엠보 1 무관, 폭 +300까지 슬리팅 OK (담당자, 날짜)"}
+  "default": {"width_plus": 200, "length_plus": 200},
+  "P0001": {"width_plus": 300, "length_plus": 500, "items": ["2PD2030WH1N"], "grades": ["A1"], "note": "엠보 1 무관, 폭 +300까지 슬리팅 OK (담당자, 날짜)"}
 }
 ```
 
 | 키 | 뜻 |
 | --- | --- |
-| `width_plus` | 주문 폭보다 몇 mm 까지 넓은 롤을 슬리팅 후보로 볼지 (기본 100) |
+| `width_plus` | 주문 폭보다 몇 mm 까지 넓은 롤을 슬리팅 후보로 볼지 (기본 200) |
+| `length_plus` | 주문 길이보다 몇 m 까지 긴 롤을 재단 후보로 볼지 (기본 200) |
 | `items` | 대체 출고를 허용한 다른 품목코드 (예: 엠보만 다른 코드) |
 | `grades` | 주문 등급 대신 허용한 등급 (예: A 주문에 A1) |
 | `note` | 담당자 코멘트 — 화면에 그대로 표시 |
 
-코드에서는 `set_rule("거래처코드", width_plus=300, grades=["A1"], note="…")`, CLI 는 `--partner 거래처코드`. `default` 를 바꾸면 전 거래처 기본값이 바뀐다.
+코드에서는 `set_rule("거래처코드", width_plus=300, length_plus=500, grades=["A1"], note="…")`, CLI 는 `--partner 거래처코드`. `default` 를 바꾸면 전 거래처 기본값이 바뀐다.
 거래처 기준 파일은 팀이 함께 쓰는 값이므로 바꾸면 커밋해서 공유한다(개인 실험은 `--rules 다른파일.json`).
 
 ## 연초 처리

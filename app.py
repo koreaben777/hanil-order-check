@@ -2,7 +2,7 @@
 
     ../DB조회도구/.venv/bin/python app.py        →  http://127.0.0.1:8765
 
-API (JSON):  GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&width_plus&items&grades&note]   GET /api/items?q=   GET /api/partners?q=   GET|POST /api/rules
+API (JSON):  GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&width_plus&length_plus&items&grades&note]   GET /api/items?q=   GET /api/partners?q=   GET|POST /api/rules
 """
 from __future__ import annotations
 
@@ -68,10 +68,11 @@ def _list(v) -> list[str]:
 def parse_rule_fields(src: dict) -> dict:
     """폼/쿼리에서 온 대체 기준을 검증해 {width_plus, items, grades, note} 로 만든다."""
     fields = {}
-    if src.get("width_plus") not in (None, ""):
-        fields["width_plus"] = int(src["width_plus"])
-        if fields["width_plus"] < 0:
-            raise ValueError("폭 허용(width_plus)은 0 이상이어야 합니다.")
+    for key, label in (("width_plus", "폭 허용(width_plus)"), ("length_plus", "길이 허용(length_plus)")):
+        if src.get(key) not in (None, ""):
+            fields[key] = int(src[key])
+            if fields[key] < 0:
+                raise ValueError(f"{label}은 0 이상이어야 합니다.")
     if "items" in src:
         fields["items"] = [i.upper() for i in _list(src["items"])]
     if "grades" in src:
@@ -134,9 +135,9 @@ class Handler(BaseHTTPRequestHandler):
             self._send(500, {"error": f"{type(e).__name__}: {e}"})
 
     def log_message(self, fmt, *args):  # 조용히: 경로만
-        print(self.address_string(), fmt % args)
+        print(self.address_string(), fmt % args, flush=True)
 
 
 if __name__ == "__main__":
-    print(f"http://{HOST}:{PORT}  (Ctrl+C 로 종료)")
+    print(f"http://{HOST}:{PORT}  (Ctrl+C 로 종료)", flush=True)
     ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
