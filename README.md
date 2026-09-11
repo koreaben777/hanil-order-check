@@ -14,14 +14,15 @@
 
 ## 준비 — 반드시 hhhs-db-manager 가 설치된 파이썬으로 실행한다
 
-이 앱은 ERP 조회를 팀 공용 도구 **hhhs-db-manager**(`hhhs_db_manager.py` + `.env`)에 맡긴다. 그 도구의 의존성(**pymssql**, SQLAlchemy, pandas, python-dotenv)이
-들어 있는 파이썬으로 띄워야 한다. 터미널에서 그냥 `python app.py` 를 치면 맥 기본 파이썬(anaconda·시스템)이 잡히는데, 거기에는 보통 pymssql 이 없다.
+**요구사항: [hhhs-db-manager](https://github.com/koreaben777/hhhs-db-manager)** — 이 앱은 ERP 조회를 그 팀 공용 도구(`hhhs_db_manager.py` + `.env`)에 맡긴다.
+없으면 먼저 `git clone https://github.com/koreaben777/hhhs-db-manager` 한 뒤 그 README 대로 `.venv` 와 `.env` 를 준비한다.
+그 도구의 의존성(**pymssql**, SQLAlchemy, pandas, python-dotenv)이 들어 있는 파이썬으로 띄워야 한다. 터미널에서 그냥 `python app.py` 를 치면 맥 기본 파이썬(anaconda·시스템)이 잡히는데, 거기에는 보통 pymssql 이 없다.
 그러면 **서버는 정상으로 뜨고 화면도 열리지만, "판단하기"를 누르는 첫 조회에서 `ModuleNotFoundError: No module named 'pymssql'` 가 난다.**
 
 | 방법 | 언제 | 실행 파이썬 |
 | --- | --- | --- |
 | A. 팀 작업 사본의 가상환경 사용 (권장) | `DB조회도구/`(hhhs-db-manager 작업 사본) 옆에 이 저장소를 `dev/` 로 둔 경우 | `../DB조회도구/.venv/bin/python` |
-| B. 다른 위치의 hhhs-db-manager 사용 | 저장소를 아무 곳에나 클론한 경우 | 그 도구의 venv 파이썬 + `HHHS_DB_DIR=<hhhs_db_manager.py 폴더>` |
+| B. 다른 위치의 [hhhs-db-manager](https://github.com/koreaben777/hhhs-db-manager) 사용 | 저장소를 아무 곳에나 클론한 경우 | 그 도구의 venv 파이썬 + `HHHS_DB_DIR=<hhhs_db_manager.py 폴더>` |
 | C. 내 파이썬에 도구를 설치 | anaconda 등 평소 쓰는 파이썬으로 띄우고 싶을 때 | `pip install -e <hhhs-db-manager 폴더>` 후 그 `python` |
 
 - `.env`(접속정보)는 hhhs-db-manager 폴더에만 둔다. **이 저장소에는 절대 커밋하지 않는다** (`.gitignore` 로 막아 둠).
