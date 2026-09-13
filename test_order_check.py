@@ -42,7 +42,7 @@ def test_rules_file():
         oc.set_rule("P1", p, width_plus=300, length_plus=500, items=[" 2pd2040nt2n "], grades=["a1"], note="엠보 무관")
         r = oc.rule_for("P1", oc.load_rules(p))
         assert (r["width_plus"], r["length_plus"], r["items"], r["grades"], r["note"]) == (300, 500, ["2PD2040NT2N"], ["A1"], "엠보 무관")
-        assert (oc.rule_for("P2", oc.load_rules(p))["width_plus"], oc.rule_for("P2", oc.load_rules(p))["length_plus"]) == (200, 200)   # 다른 거래처는 기본
+        assert (oc.rule_for("P2", oc.load_rules(p))["width_plus"], oc.rule_for("P2", oc.load_rules(p))["length_plus"]) == (200, 20)   # 다른 거래처는 기본
         oc.set_rule("P1", p, note="폭만")                                                      # 부분 갱신, 나머지 유지
         assert oc.rule_for("P1", oc.load_rules(p))["width_plus"] == 300
         assert "updated" in json.loads(p.read_text())["P1"]
@@ -61,7 +61,7 @@ def test_check_with_fake_db():
                           ("2PD2040NT1N", 1100, 2000, "A", 5, 440.0),     # 폭+30 → 기본 후보
                           ("2PD2040NT1N", 1250, 2000, "A", 9, 900.0),     # 폭+180 → 기본(+200) 후보
                           ("2PD2040NT1N", 1300, 2000, "A", 6, 624.0),     # 폭+230 → width_plus≥230 일 때만
-                          ("2PD2040NT1N", 1070, 2150, "A", 2, 184.0),     # 길이+150 → 기본(+200) 후보
+                          ("2PD2040NT1N", 1070, 2150, "A", 2, 184.0),     # 길이+150 → length_plus≥150 일 때만 (기본 +20 밖)
                           ("2PD2040NT1N", 1070, 2300, "A", 7, 688.6),     # 길이+300 → length_plus≥300 일 때만
                           ("2PD2040NT1N", 1070, 2000, "A1", 4, 342.4),    # 등급대체 → grades 에 A1 있을 때만
                           ("2PD2040NT2N", 1070, 2000, "A", 3, 256.8),     # 품목대체 → items 에 있을 때만, 미출하 3 → 가용 0
@@ -81,23 +81,23 @@ def test_check_with_fake_db():
             setattr(oc, k, f)
         with tempfile.TemporaryDirectory() as d:
             p = Path(d) / "rules.json"
-            # 기본 기준(폭 +200 · 길이 +200): 재고 24 + 대체(길이+150 2, 폭+30 5, 폭+180 9 = 16) + 생산 8
+            # 기본 기준(폭 +200 · 길이 +20): 재고 24 + 대체(폭+30 5, 폭+180 9 = 14) + 생산 10. 길이+150 은 +20 밖이라 제외
             r = oc.check(oc.Order("2PD2040NT1N", 1070, 2000, "A", rolls=48, partner="P1"), today=date(2026, 9, 10), rules_file=p)
             assert (r["onhand_rolls"], r["open_rolls"], r["avail_rolls"]) == (30, 6, 24)
-            assert (r["stock_rolls"], r["sub_rolls"], r["prod_rolls"]) == (24, 16, 8)
+            assert (r["stock_rolls"], r["sub_rolls"], r["prod_rolls"]) == (24, 14, 10)
             assert r["decisions"] == ["재고출하", "대체검토", "생산의뢰"]
-            assert list(r["subs"].kind) == ["길이+150", "폭+30", "폭+180"] and list(r["subs"].alloc) == [2, 5, 9]   # 같은 폭(재단만) 먼저
-            assert "재고출하 24롤 (50%)" in oc.report(r) and "생산의뢰 8롤 (17%)" in oc.report(r)
-            # 거래처 기준 추가(폭 +300 · 품목 NT2N · 등급 A1): 폭+230 6 추가, 등급 4, 품목 0(미출하) → 생산 0 (24+2+5+9+6+4=50≥48)
-            oc.set_rule("P1", p, width_plus=300, items=["2PD2040NT2N"], grades=["A1"], note="엠보 무관")
+            assert list(r["subs"].kind) == ["폭+30", "폭+180"] and list(r["subs"].alloc) == [5, 9]
+            assert "재고출하 24롤 (50%)" in oc.report(r) and "생산의뢰 10롤 (21%)" in oc.report(r)
+            # 거래처 기준 추가(폭 +300 · 길이 +200 · 품목 NT2N · 등급 A1): 길이+150 2, 폭+230 6 추가, 등급 2, 품목 0 → 생산 0
+            oc.set_rule("P1", p, width_plus=300, length_plus=200, items=["2PD2040NT2N"], grades=["A1"], note="엠보 무관")
             r = oc.check(oc.Order("2PD2040NT1N", 1070, 2000, "A", rolls=48, partner="P1"), today=date(2026, 9, 10), rules_file=p)
-            assert list(r["subs"].kind) == ["길이+150", "폭+30", "폭+180", "폭+230", "등급", "품목"]
+            assert list(r["subs"].kind) == ["길이+150", "폭+30", "폭+180", "폭+230", "등급", "품목"]   # 같은 폭(재단만) 먼저
             assert list(r["subs"].alloc) == [2, 5, 9, 6, 2, 0] and (r["sub_rolls"], r["prod_rolls"]) == (24, 0)
             assert r["decisions"] == ["재고출하", "대체검토"]
             assert "거래처 기준" in oc.report(r) and "엠보 무관" in oc.report(r)
             # 다른 거래처는 기본 기준 그대로
             r = oc.check(oc.Order("2PD2040NT1N", 1070, 2000, "A", rolls=48, partner="P2"), today=date(2026, 9, 10), rules_file=p)
-            assert (r["sub_rolls"], r["prod_rolls"]) == (16, 8) and r["rule_source"] == "기본"
+            assert (r["sub_rolls"], r["prod_rolls"]) == (14, 10) and r["rule_source"] == "기본"
             # 임시 기준(저장 안 함): 길이 +300 → 길이+300 7롤 추가, 파일은 그대로
             r = oc.check(oc.Order("2PD2040NT1N", 1070, 2000, "A", rolls=48), today=date(2026, 9, 10), rules_file=p,
                          override={"length_plus": 300, "items": None})

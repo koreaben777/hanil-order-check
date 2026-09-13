@@ -6,7 +6,7 @@
     ../DB조회도구/.venv/bin/python order_check.py 2PD2040NT1N -w 1070 -l 2000 -g A -r 48
     ../DB조회도구/.venv/bin/python order_check.py 2PD2040NT1N -w 1070 -l 2000 --kg 4108.8 --partner 거래처코드
 
-대체 기준: 기본은 "같은 품목·등급, 폭 +200mm · 길이 +200m 까지(슬리팅·재단 가정)". 거래처별 허용 범위는 `substitute_rules.json` 에
+대체 기준: 기본은 "같은 품목·등급, 폭 +200mm · 길이 +20m 까지(슬리팅·재단 가정)". 거래처별 허용 범위는 `substitute_rules.json` 에
 영업담당자가 적는다 — set_rule("거래처코드", width_plus=300, length_plus=500, items=["2PD2030WH1N"], grades=["A1"], note="…").
 """
 from __future__ import annotations
@@ -32,7 +32,7 @@ GRADES = ("A", "A0", "A1", "B", "C", "D", "R")
 MACHINES = ("1", "2")                                # 품목코드 첫 자리: 1호기 PET/PLA · 2호기 PP
 SPEC = ["item", "width", "length", "grade"]
 RULES_FILE = Path(__file__).with_name("substitute_rules.json")
-DEFAULT_RULE = {"width_plus": 200, "length_plus": 200, "items": [], "grades": [], "note": ""}   # 폭 mm · 길이 m
+DEFAULT_RULE = {"width_plus": 200, "length_plus": 20, "items": [], "grades": [], "note": ""}   # 폭 mm · 길이 m
 
 
 @dataclass

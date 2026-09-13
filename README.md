@@ -61,7 +61,7 @@ API(JSON): `GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&widt
 | 품목 | `MA_PITEM` | 제품(003)만. 평량·색상·기능(`CD_USERDEF3`)으로 롤당 kg = 폭(m)×길이(m)×평량÷1000 |
 | 현재고 | `MM_QTIOLOT` | 의령(3000)·SB창고(3000)·올해 기초+수불 합산, 품목·폭·길이·등급별 잔량>0 LOT 수 = 롤수 |
 | 가용 | `SA_SOL`+`SA_SOH` | 규격별 미출하 수주(QT_SO>QT_GI, STA_SO='R', 올해) 롤수를 차감. 대체 후보 규격에도 같은 차감 적용 |
-| 대체 후보 | 위 재고 | 폭 [주문, 주문+width_plus] · 길이 [주문, 주문+length_plus] (넓은 폭은 슬리팅, 긴 길이는 재단 가정). 기본은 같은 품목·등급, 폭 +200mm · 길이 +200m. 거래처 기준으로 허용 범위·품목·등급을 넓힌다. 같은 품목 → 같은 등급 → 좁은 폭 → 짧은 길이 순으로 배정 |
+| 대체 후보 | 위 재고 | 폭 [주문, 주문+width_plus] · 길이 [주문, 주문+length_plus] (넓은 폭은 슬리팅, 긴 길이는 재단 가정). 기본은 같은 품목·등급, 폭 +200mm · 길이 +20m. 거래처 기준으로 허용 범위·품목·등급을 넓힌다. 같은 품목 → 같은 등급 → 좁은 폭 → 짧은 길이 순으로 배정 |
 | 생산 | `PR_PRQL` | 최근 14일 생산요청(품목 단위 — 규격 컬럼이 비어 있음) 참고 표시 |
 
 ```
@@ -79,7 +79,7 @@ API(JSON): `GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&widt
 
 ```json
 {
-  "default": {"width_plus": 200, "length_plus": 200},
+  "default": {"width_plus": 200, "length_plus": 20},
   "P0001": {"width_plus": 300, "length_plus": 500, "items": ["2PD2030WH1N"], "grades": ["A1"], "note": "엠보 1 무관, 폭 +300까지 슬리팅 OK (담당자, 날짜)"}
 }
 ```
@@ -87,7 +87,7 @@ API(JSON): `GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&widt
 | 키 | 뜻 |
 | --- | --- |
 | `width_plus` | 주문 폭보다 몇 mm 까지 넓은 롤을 슬리팅 후보로 볼지 (기본 200) |
-| `length_plus` | 주문 길이보다 몇 m 까지 긴 롤을 재단 후보로 볼지 (기본 200) |
+| `length_plus` | 주문 길이보다 몇 m 까지 긴 롤을 재단 후보로 볼지 (기본 20) |
 | `items` | 대체 출고를 허용한 다른 품목코드 (예: 엠보만 다른 코드) |
 | `grades` | 주문 등급 대신 허용한 등급 (예: A 주문에 A1) |
 | `note` | 담당자 코멘트 — 화면에 그대로 표시 |

@@ -114,10 +114,10 @@
 
       <div class="card" id="rulecard">
         <h2>거래처 대체 기준</h2>
-        <div class="rule" id="rulenow"><span class="badge">기본</span><span class="sub">폭 +200mm · 길이 +200m · 같은 품목·등급</span></div>
+        <div class="rule" id="rulenow"><span class="badge">기본</span><span class="sub">폭 +200mm · 길이 +20m · 같은 품목·등급</span></div>
         <div class="row">
           <div><label>폭 허용 (+mm)</label><input type="number" id="r_width" min="0" placeholder="200"></div>
-          <div><label>길이 허용 (+m)</label><input type="number" id="r_length" min="0" placeholder="200"></div>
+          <div><label>길이 허용 (+m)</label><input type="number" id="r_length" min="0" placeholder="20"></div>
         </div>
         <label>허용 대체 품목코드 <span class="dim">쉼표 구분</span></label><input class="mono" id="r_items" placeholder="2PD2040NT2N, 2PD2040NT4N">
         <label>허용 대체 등급 <span class="dim">쉼표 구분</span></label><input class="mono" id="r_grades" placeholder="A1">
@@ -199,7 +199,7 @@ $('item').addEventListener('change', async () => { await resolveGsm(); syncQty()
 
 // 거래처 기준 패널
 async function loadRules() { try { rules = await api('/api/rules'); } catch (e) { rules = {}; } fillRule(); }
-function ruleFor(p) { const d = {width_plus: 200, length_plus: 200, items: [], grades: [], note: '', ...(rules.default || {})}; return p && rules[p] ? {...d, ...rules[p]} : d; }
+function ruleFor(p) { const d = {width_plus: 200, length_plus: 20, items: [], grades: [], note: '', ...(rules.default || {})}; return p && rules[p] ? {...d, ...rules[p]} : d; }
 const ruleText = r => `폭 +${r.width_plus}mm · 길이 +${r.length_plus}m${r.items.length ? ' · 품목 ' + esc(r.items.join(', ')) : ''}${r.grades.length ? ' · 등급 ' + esc(r.grades.join(', ')) : ''}`;
 function fillRule() {
   const p = $('partner').value.trim(), r = ruleFor(p), own = !!(p && rules[p]);
