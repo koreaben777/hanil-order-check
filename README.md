@@ -17,6 +17,7 @@
 | `test_hanilsf_optimizer.py` | DB 없이 도는 자가 점검 |
 | `hanilsf_optimizer.ipynb` | 노트북 — 모듈1·모듈2·배분을 예시 상품으로 한 번씩 실행한 출력 포함 (VS Code·JupyterLab 에서 `DB조회도구/.venv` 커널로 열기) |
 | `TESTING.md` | 실행 방법과 기능 테스트용 입력값 (복사해서 바로 실행) |
+| `NOTEBOOK_GUIDE.md` | 팀원용 — 두 저장소 설치부터 노트북 두 개로 재고 스펙 조회·검증까지 따라하는 테스트 가이드 |
 
 ## 설치
 
