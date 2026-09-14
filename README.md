@@ -15,6 +15,7 @@
 | `app.py` · `index.html` | 로컬 웹앱 (표준 라이브러리 `http.server`, 127.0.0.1 전용) |
 | `substitute_rules.json` | 대체 기준. 기본값 + 거래처별 허용 범위(영업담당자 입력) |
 | `test_hanilsf_optimizer.py` | DB 없이 도는 자가 점검 |
+| `hanilsf_optimizer.ipynb` | 노트북 — 모듈1·모듈2·배분을 예시 상품으로 한 번씩 실행한 출력 포함 (VS Code·JupyterLab 에서 `DB조회도구/.venv` 커널로 열기) |
 | `TESTING.md` | 실행 방법과 기능 테스트용 입력값 (복사해서 바로 실행) |
 
 ## 설치
