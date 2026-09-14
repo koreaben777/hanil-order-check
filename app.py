@@ -1,4 +1,4 @@
-"""order_check 의 로컬 웹앱 — 이 맥에서만 (127.0.0.1). 표준 라이브러리 http.server, 의존성 추가 없음.
+"""hanilsf_optimizer 의 로컬 웹앱 — 이 맥에서만 (127.0.0.1). 표준 라이브러리 http.server, 의존성 추가 없음.
 
     ../DB조회도구/.venv/bin/python app.py        →  http://127.0.0.1:8765
 
@@ -7,38 +7,18 @@ API (JSON):  GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&wid
 from __future__ import annotations
 
 import json
-import math
 import traceback
-from decimal import Decimal
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-import numpy as np
 import pandas as pd
 
-import order_check as oc
+import hanilsf_optimizer as oc
+from hanilsf_optimizer import jsonable
 
 HERE = Path(__file__).resolve().parent
 HOST, PORT = "127.0.0.1", 8765
-
-
-def jsonable(v):
-    if isinstance(v, pd.DataFrame):
-        return [jsonable(r) for r in v.to_dict("records")]
-    if isinstance(v, oc.Order):
-        return jsonable(vars(v))
-    if isinstance(v, dict):
-        return {str(k): jsonable(x) for k, x in v.items()}
-    if isinstance(v, (list, tuple)):
-        return [jsonable(x) for x in v]
-    if isinstance(v, np.generic):
-        v = v.item()
-    if isinstance(v, Decimal):
-        v = float(v)
-    if isinstance(v, float) and math.isnan(v):
-        return None
-    return v
 
 
 def search_items(q: str) -> pd.DataFrame:

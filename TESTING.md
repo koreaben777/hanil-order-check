@@ -39,7 +39,7 @@ lsof -ti :8765 | xargs kill
 ### 1-3. DB 없이 로직만 점검
 
 ```bash
-cd "$HANIL_DEV" && "$HANIL_PY" test_order_check.py
+cd "$HANIL_DEV" && "$HANIL_PY" test_hanilsf_optimizer.py
 ```
 
 모든 줄이 `ok test_…` 로 나오면 정상(오류가 있으면 Traceback 이 찍힌다).
@@ -55,6 +55,30 @@ cd "$HANIL_DEV" && "$HANIL_PY" test_order_check.py
 | 화면에`DBError …`                                       | ERP 접속·권한·제한시간                             | 1-1 자가점검                                                                              |
 
 한 조회에 ERP 쿼리 5회(기초행 확인 · 품목 · 재고 · 미출하 수주 · 생산요청)가 나가며 보통 2~3초 걸린다.
+
+### 1-5. 파이썬 모듈로 쓰기 (팀장 요청 형태: `import hanilsf_optimizer`)
+
+소스 체크아웃에서 바로 (1-0 경로 설정 뒤):
+
+```bash
+cd "$HANIL_DEV" && "$HANIL_PY" -c "import hanilsf_optimizer as ho, json; print(json.dumps(ho.stock({'item':'2PD2040NT1N','width':1070,'length':2000}), ensure_ascii=False))"
+```
+
+```bash
+cd "$HANIL_DEV" && "$HANIL_PY" -c "import hanilsf_optimizer as ho, json; print(json.dumps(ho.similar_products({'item':'2PD2040NT1N','width':1070,'length':2000}, n=5), ensure_ascii=False, indent=2))"
+```
+
+다른 파이썬 환경에 패키지로 설치해서 쓸 때 (hhhs-db-manager 가 GitHub 에서 같이 설치된다):
+
+```bash
+pip install "git+https://github.com/koreaben777/hanil-order-check"
+```
+
+```bash
+export HHHS_ENV_FILE="$HANIL_DB/.env" && hanilsf 2PD2040NT1N -w 1070 -l 2000
+```
+
+`hanilsf` 는 설치 시 생기는 명령이다(수량 없이 부르면 모듈1·2 JSON, `-r 48` 을 붙이면 배분 보고서). 접속정보는 `HHHS_ENV_FILE` 로 알려준다.
 
 ## 2. 화면 사용 순서
 
@@ -84,18 +108,35 @@ cd "$HANIL_DEV" && "$HANIL_PY" test_order_check.py
 | T9  | 입력 누락                | `2PD2040NT1N` | 1070 | 2000 | A    | (비움)      | —                | 오류 배너: 롤수 또는 kg 필요                                                                                                                                                                                                              |
 | T10 | 없는 품목                | `2PD9999XX9X` | 1000 | 1000 | A    | 1롤         | —                | 오류 배너: MA_PITEM 에 없는 품목                                                                                                                                                                                                          |
 
-CLI 로 같은 것을 볼 때 (1-0 의 경로 설정이 된 터미널에서):
+모듈1(재고 수)·모듈2(유사 상품)만 볼 때 — 수량·거래처 없이 규격만 넣는다:
+
+| #   | 목적                 | 입력 dict                                                        | 기대 결과 |
+| --- | -------------------- | ---------------------------------------------------------------- | --- |
+| M1  | 재고 수              | `{"item":"2PD2040NT1N","width":1070,"length":2000}`             | `rolls`·`kg`·`open_rolls`·`avail_rolls` 네 숫자. 등급 생략은 A. 웹앱 T1 의 "현재고 − 미출하 = 가용" 과 같은 값 |
+| M2  | 없는 규격            | `{"item":"2PD2040NT1N","width":999,"length":2000}`              | 오류 없이 모두 0 |
+| M3  | 유사 상품 기본 기준  | M1 과 동일, `n=5`                                                 | 폭 1070~1270 · 길이 2000~2020 · 같은 품목·등급 후보만, `kind` 가 `폭+30` 처럼 표시, 가용 0 은 빠짐. 없으면 `[]` |
+| M4  | 임시 기준 넓히기     | M1 + `rule={"width_plus":300,"length_plus":500,"grades":["A1"]}` | 후보가 늘고 `kind` 에 `등급`·`길이+…` 가 생긴다(재고가 있을 때). 파일은 바뀌지 않는다 |
+| M5  | 입력 오류            | `{"item":"3PD2060UB1N","width":600,"length":200}`               | `ValueError: … 1·2호기 품목 … 만 지원합니다.` |
+| M6  | 필수 키 누락         | `{"item":"2PD2040NT1N","width":1070}`                           | `ValueError: 필수 키가 빠졌습니다: ['length'] …` |
+
+CLI 로 M1+M3 를 한 번에 (수량을 주지 않으면 모듈1·2 JSON):
 
 ```bash
-cd "$HANIL_DEV" && "$HANIL_PY" order_check.py 2PD2040NT1N -w 1070 -l 2000 -g A -r 48
+cd "$HANIL_DEV" && "$HANIL_PY" hanilsf_optimizer.py 2PD2040NT1N -w 1070 -l 2000 -n 5
+```
+
+배분(`check`)을 CLI 로 볼 때 (1-0 의 경로 설정이 된 터미널에서):
+
+```bash
+cd "$HANIL_DEV" && "$HANIL_PY" hanilsf_optimizer.py 2PD2040NT1N -w 1070 -l 2000 -g A -r 48
 ```
 
 ```bash
-cd "$HANIL_DEV" && "$HANIL_PY" order_check.py 2PD2030WH2N -w 1000 -l 1000 -g A -r 60
+cd "$HANIL_DEV" && "$HANIL_PY" hanilsf_optimizer.py 2PD2030WH2N -w 1000 -l 1000 -g A -r 60
 ```
 
 ```bash
-cd "$HANIL_DEV" && "$HANIL_PY" order_check.py 2PD2038WH1N -w 650 -l 2000 --kg 592.8
+cd "$HANIL_DEV" && "$HANIL_PY" hanilsf_optimizer.py 2PD2038WH1N -w 650 -l 2000 --kg 592.8
 ```
 
 API 로 볼 때 (서버가 떠 있는 상태에서, 아무 터미널):

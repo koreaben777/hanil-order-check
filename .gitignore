@@ -16,3 +16,8 @@ __pycache__/
 # 로컬
 .DS_Store
 substitute_rules.local.json
+
+# 패키지 빌드 산출물
+build/
+dist/
+*.egg-info/

@@ -1,0 +1,20 @@
+[project]
+name = "hanilsf-optimizer"
+version = "0.1.0"
+description = "한일합섬 의령공장 1·2호기 — 상품 규격 dict 로 재고 수 · 유사(대체) 상품 · 재고출하/대체검토/생산의뢰 배분 (ERP 읽기 전용)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.0",
+    "hhhs-db-manager @ git+https://github.com/koreaben777/hhhs-db-manager",
+]
+
+[project.scripts]
+hanilsf = "hanilsf_optimizer:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["hanilsf_optimizer"]
