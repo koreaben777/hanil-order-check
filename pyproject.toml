@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "pandas>=2.0",
+    "ortools>=9.10",
+    "openpyxl>=3.1",
     "hhhs-db-manager @ git+https://github.com/koreaben777/hhhs-db-manager",
 ]
 
@@ -17,4 +19,4 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["hanilsf_optimizer"]
+py-modules = ["hanilsf_optimizer", "hanilsf_plan", "hanilsf_schedule", "hanilsf_demo"]
