@@ -1,0 +1,70 @@
+{
+  "color": {
+    "same_h": 0,
+    "light_to_dark_h": 0.83,
+    "dark_to_light_h": 5.5,
+    "dark_to_light_cr_rolls": 6,
+    "lightness_order": [
+      "WH",
+      "NT",
+      "UV",
+      "UB",
+      "AW",
+      "CP",
+      "IV",
+      "LA",
+      "LB",
+      "LG",
+      "BE",
+      "YL",
+      "PK",
+      "OR",
+      "GD",
+      "MA",
+      "BR",
+      "RD",
+      "DA",
+      "DG",
+      "DB",
+      "UG",
+      "BK"
+    ],
+    "estimated": true,
+    "comments": {
+      "same_h": "[추정] C-04: identical full color code",
+      "light_to_dark_h": "[추정] C-03: 40-60 minute midpoint, specified 0.83h",
+      "dark_to_light_h": "[추정] C-01/C-02: 5-6 hour midpoint; other descending colors also estimated",
+      "dark_to_light_cr_rolls": "[추정] C-02/C-05: 5-7 roll midpoint, BK->WH only",
+      "lightness_order": "[추정] 관측 계열의 추정 순서, 기준표 수령 시 교체 (C-01/C-04)"
+    }
+  },
+  "weight": {
+    "threshold_gsm": 30,
+    "drop_h_per_gsm": 0.0375,
+    "rise_h_per_gsm": 0,
+    "agri_switch_h": 1.0,
+    "anchor": "100g→30g 직행 = 1.5h (S-05 경험값 1~2h 중앙값)",
+    "estimated": true,
+    "comments": {
+      "threshold_gsm": "[추정] S-05: natural cooling threshold, not a measured standard",
+      "drop_h_per_gsm": "[추정] S-05: 1.5h / (70g - 30g)",
+      "rise_h_per_gsm": "[추정] S-04/S-06: no heating-time table; zero baseline",
+      "agri_switch_h": "[추정] S-07: no temperature-reset table",
+      "anchor": "[추정] S-05: calibration example, not validated transition data"
+    }
+  },
+  "cr_roll_kg": 100,
+  "objective": {
+    "urgent_weight": 10,
+    "cr_minutes_per_roll": 60,
+    "estimated": true,
+    "comments": {
+      "urgent_weight": "[추정] S-08/S-09: unspecified weight, configurable conservative baseline",
+      "cr_minutes_per_roll": "[추정] C-02/C-05: unspecified kappa, configurable 1h per CR roll"
+    }
+  },
+  "estimated": true,
+  "comments": {
+    "cr_roll_kg": "[추정] C-06: placeholder 100kg/roll; actual CR specification required"
+  }
+}
