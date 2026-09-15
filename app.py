@@ -3,6 +3,8 @@
     ../DB조회도구/.venv/bin/python app.py        →  http://127.0.0.1:8765
 
 API (JSON):  GET /api/check?item&width&length&grade&rolls|kg&partner[&temp=1&width_plus&length_plus&items&grades&note]   GET /api/items?q=   GET /api/partners?q=   GET|POST /api/rules
+             POST /api/optimize {requests:[{item,width,length,grade,rolls,gsm,partner,order_id}], t0, machine_state:{color_code,gsm,agri}, time_limit}  → {plan, schedule}  (장바구니 생산분 → 세트 계획 → 순서)
+             GET /api/examples  → cart_examples.json (② 탭 예시 생산 집합 5개)
 """
 from __future__ import annotations
 
@@ -16,6 +18,8 @@ import pandas as pd
 
 import hanilsf_optimizer as oc
 from hanilsf_optimizer import jsonable
+import hanilsf_plan as hp
+import hanilsf_schedule as hs
 
 HERE = Path(__file__).resolve().parent
 HOST, PORT = "127.0.0.1", 8765
@@ -65,6 +69,43 @@ def parse_rule_fields(src: dict) -> dict:
     return fields
 
 
+def examples() -> list:
+    """② 생산 정의 탭의 예시 생산 집합(cart_examples.json). 규격만 있고 거래처·납기는 없다."""
+    path = HERE / "cart_examples.json"
+    if not path.exists():
+        return []
+    data = json.loads(path.read_text(encoding="utf-8"))
+    for e in data:
+        for r in e["rows"]:
+            for k in ("item", "width", "length", "rolls", "gsm"):
+                if k not in r:
+                    raise ValueError(f"예시 {e.get('id')} 행에 {k} 가 없습니다.")
+    return data
+
+
+def optimize(body: dict) -> dict:
+    """장바구니 생산분(요청 dict 목록) → 1단 plan() → 2단 schedule(). ERP 를 읽지 않는다.
+    plan 이 미해결이면 schedule 은 None. 계수는 추정값(결과 warnings 참고)."""
+    from datetime import date, datetime, time, timedelta
+    requests = body.get("requests")
+    if not isinstance(requests, list) or not requests:
+        raise ValueError("장바구니가 비어 있습니다. 주문 판단 탭에서 생산의뢰분을 담으세요.")
+    raw = body.get("time_limit")
+    try:
+        limit = float(120 if raw in (None, "") else raw)
+    except (TypeError, ValueError):
+        raise ValueError("시간 제한은 숫자여야 합니다.") from None
+    if not 0 < limit <= 600:
+        raise ValueError("시간 제한은 0 초과 600 이하여야 합니다.")
+    state = body.get("machine_state") or {}
+    machine_state = dict(color_code=str(state.get("color_code") or "WH1N").strip().upper(),
+                         gsm=float(state.get("gsm") or 40), agri=bool(state.get("agri", False)))
+    t0 = body.get("t0") or datetime.combine(date.today() + timedelta(days=1), time()).isoformat()
+    plan_result = hp.plan(requests, time_limit=limit)
+    schedule = hs.schedule(plan_result, t0=t0, machine_state=machine_state, time_limit=limit) if plan_result["complete"] else None
+    return {"plan": plan_result, "schedule": schedule}
+
+
 class Handler(BaseHTTPRequestHandler):
     def _send(self, code: int, body, ctype="application/json; charset=utf-8"):
         data = body if isinstance(body, bytes) else json.dumps(body, ensure_ascii=False).encode("utf-8")
@@ -92,6 +133,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(200, jsonable(search_partners(q.get("q", ""))) if q.get("q") else [])
             if u.path == "/api/rules":
                 return self._send(200, oc.load_rules())
+            if u.path == "/api/examples":
+                return self._send(200, examples())
             self._send(404, {"error": "not found"})
         except (ValueError, KeyError) as e:
             self._send(400, {"error": str(e) or "입력값을 확인하세요."})
@@ -100,10 +143,13 @@ class Handler(BaseHTTPRequestHandler):
             self._send(500, {"error": f"{type(e).__name__}: {e}"})
 
     def do_POST(self):
-        if urlparse(self.path).path != "/api/rules":
+        path = urlparse(self.path).path
+        if path not in ("/api/rules", "/api/optimize"):
             return self._send(404, {"error": "not found"})
         try:
             body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0)) or 0) or b"{}")
+            if path == "/api/optimize":
+                return self._send(200, jsonable(optimize(body)))
             partner = str(body.get("partner", "")).strip()
             if not partner:
                 raise ValueError("거래처코드가 필요합니다.")

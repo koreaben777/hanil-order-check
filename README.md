@@ -52,7 +52,7 @@ export HHHS_ENV_FILE="$HOME/Documents/Eugene_Group/한일합섬/DB조회도구/.
 | C. 내 파이썬(anaconda 등)으로 띄우고 싶음 | `pip install -e <hhhs-db-manager 폴더>` 후 그 `python` (또는 방법 1) |
 
 - `.env`(접속정보)는 hhhs-db-manager 폴더에만 둔다. **이 저장소에는 절대 커밋하지 않는다** (`.gitignore` 로 막아 둠).
-- 파이썬 3.10+. 이 저장소가 더하는 의존성은 pandas 뿐(hhhs-db-manager 에 이미 포함).
+- 파이썬 3.10+. 재고 조회는 pandas(hhhs-db-manager 에 포함), 생산 배치는 ortools·openpyxl을 사용한다. 방법 2에서는 `uv pip install --python ../DB조회도구/.venv/bin/python ortools openpyxl`로 설치한다.
 
 ## 파이썬 모듈 API
 
@@ -74,6 +74,72 @@ ho.jsonable(r)                              # json.dumps 가능한 dict (DataFra
 ```
 
 숫자는 2026-09-14 실측 예시이며 재고는 매일 바뀐다. 세 함수 모두 ERP 를 읽기만 하고, 한 번 호출에 SELECT 3~5회(2~3초)가 나간다.
+
+### 웹앱 탭 — ① 주문 입력·판단 → ② 생산 정의 → ③ 생산 계획
+
+`app.py` 웹앱에 탭이 하나 더 있다. ① 탭에서 주문을 여러 번 판단하고 결과의 **생산 필요분 담기**를 누르면 ② 생산 정의(장바구니, 브라우저 localStorage 에 보관, 같은 규격은 롤수 합산)에 쌓인다. ③ 에서 적용 시작 시각·직전 설비 상태·시간 제한(기본 120초, 단계별)을 넣고 **최적화 실행**을 누르면 `POST /api/optimize` 가 `plan()`(1단 세트 계획) → `schedule()`(2단 순서)를 차례로 풀어 세트표·순서표·경고를 보여준다. ERP 는 읽지 않으며 계수는 추정값이다. ② 카드의 드롭다운에서 **예시 생산 집합 5개**(`cart_examples.json`, 2026-07 의뢰서 규격만 무작위 추출·거래처 없음: 흰색 계열 27행 · 혼합 40행 · 진한 색 위주 54행 · 무작위 73행 · 대량 99행)를 골라 **예시 담기**로 바로 채울 수 있다(`GET /api/examples`). DB 없이 도는 자가 점검: `../DB조회도구/.venv/bin/python test_app.py`.
+
+### 생산 배치·순서 — `hanilsf_plan.plan()` → `hanilsf_schedule.schedule()` (DB 연결 없음)
+
+이미 취득한 `check()` 결과(`order` 객체/dict + `prod_rolls` + `master.gsm`) 또는 직접 생산요구 dict를 받는다. 직접 입력 필수값은 `item`, `width`, `length`, `rolls`, `gsm`이다. ERP/접속정보를 읽지 않으며 `translate()`는 `NotImplementedError`다. 아래는 **합성 입력만 사용하는 2단 예시**다.
+
+```python
+from hanilsf_plan import plan, to_xlsx
+from hanilsf_schedule import schedule
+
+checked = [
+    {"order": {"item": "2TESTWH1N", "grade": "A", "width": 1030, "length": 1000},
+     "prod_rolls": 18, "master": {"gsm": 40}, "order_id": "DEMO-1", "mb_ratio": 0.01},
+    {"order": {"item": "2TESTWH1N", "grade": "B", "width": 530, "length": 1000},
+     "prod_rolls": 18, "master": {"gsm": 40}, "order_id": "DEMO-2", "mb_ratio": 0.01},
+]
+result = plan(checked,
+              base_width_by_machine={"1": 3400, "2": 3600},
+              eff_width_by_machine={"1": 3200, "2": 3400},
+              eff_width_by_color={"UV": 3500, "UB": 3500},
+              max_lanes=30, max_length=None, constraints=[], time_limit=30)
+assert result["complete"]
+print(result["groups"][0]["sets_used"])  # 9세트, 9,000m, 초과 0
+sequence = schedule(result, t0="2026-01-01T08:00:00",
+                    machine_state={"color_code": "WH1N", "gsm": 40, "agri": False},
+                    frozen=[], blocked=[], time_limit=30)
+# 원본·기존 출력을 덮어쓰지 않는 별도 로컬 사본:
+# to_xlsx(result, "../Process 3-4. PP 생산의뢰서 20260703.xlsx",
+#         "../생산계획_사본.xlsx", sheet_name="생산계획_검토", schedule=sequence)
+```
+
+**종단 CLI — 과거 의뢰서 전체에서 재현 가능한 표본 추출**
+
+`dev/`에서 실행한다. `--template` 생략 시 `--requests` 파일을 양식으로 사용하고, `--t0` 생략 시 내일 00:00으로 시작한다. 실제 날짜 납기는 그대로 보존하므로 과거 파일을 현재 시점으로 계획하면 큰 지연값이 나올 수 있다. 미해결이면 XLSX 없이 종료 코드 1이다.
+
+```bash
+../DB조회도구/.venv/bin/python hanilsf_demo.py --requests "../Process 3-4. PP 생산의뢰서 20260703.xlsx" --n 30 --seed 20260915 --out "../생산계획_사본.xlsx" --state WH1N,40,0 --time-limit 30
+```
+
+`load_requests(xlsx, sheets=None)`는 모든 시트(또는 지정 시트)의 9행부터 합계 전까지 유효 요청만 읽는다. D-01로 `2PD` + 중량대(59g 이하 2, 60g 이상 3) + 평량 3자리 + 색상코드를 만든다. 날짜는 ISO `due`, ASAP은 `urgent=True`, 기타 출고일 텍스트는 그대로 `note`다. `sample_requests(pool,n,seed)`는 지역 난수 생성기로 중복 없이 표본을 뽑는다. 원본은 읽기 전용이며 거래선 값은 요약 로그에 출력하지 않는다.
+
+**1단: 같은 품목·같은 길이의 슬리팅 세트**
+- 그룹은 **품목코드만**, 부분문제는 **(품목코드, 길이)**다. `grade`는 표시용으로 그대로 통과하며 혼합을 막지 않는다. 품목코드가 11자가 아니어도 거부하지 않고 `item {code} is not 11 chars; color_code may be wrong` 경고를 반환한다. 세트 안의 롤은 같은 길이이며 긴 롤 재단은 하지 않는다. `[미확인] K-01/K-06/K-08` 세트 구조는 현장 구두 확인 전이다.
+- 모든 비어 있지 않은 폭 패턴을 열거하고 CP-SAT 정수계획으로 **총 생산 길이 → 사용 패턴 종류 수 → 초과 롤 수**를 최소화한다. 같은 폭의 여러 주문은 수요를 합산하고 주문별 수량·초과 상한을 지켜 배분한다. 50,000조합 초과 시 큰 폭 우선 탐욕 후보로 제한하고 `approximate=true`와 경고를 반환한다. 이때 `OPTIMAL`은 제한 후보 안의 최적성이다.
+- **초과 기본 0**. `{"type":"allow_extra","order_id":"DEMO-1","rolls":2}`일 때만 주문별 2롤까지 허용한다. 초과가 있으면 `extra>0`, `suggest_upsell=true`다. 사용 패턴 수 감소를 위해 초과가 선택될 수 있지만 여유폭을 무조건 채우지는 않는다.
+- 제약: `priority(order_id,rank)`는 세트 출력 순서만, `exclusive_roll(order_id)`는 해당 폭만 있는 패턴, `no_edge(order_id)`는 해당 폭을 내부 레인에만 배치한다. `together(order_ids)`는 두 폭이 항상 같은 패턴에 있도록 하며 길이가 다르면 미지원으로 보고한다. 이 세 필터는 **주문이 가리키는 폭 기준**이므로 같은 폭의 다른 주문에도 적용된다.
+- `max_lanes(group,n)`, `max_length(group,m)`, `eff_width(group,mm)`의 `group`은 품목코드다. 길이 상한을 넘으면 `INFEASIBLE`이다. `trim(partner,mm)`는 호기 기본 트림보다 큰 경우만 그룹 유효폭을 줄인다. 유효폭은 호기 → 색상 전체코드/접두사 예외 → 직접 지정 → 추가 트림 순으로 결정한다. UV/UB 3,500mm는 `[추정][미확인] W-03`이며 `eff_width_by_color={}`로 끌 수 있다.
+- 그룹 출력: `sets`, `sets_used`(반복수 합), `total_length`, `lower_bound_sets`, `gap`, `status`, `approximate`. 세트 블록은 `pattern`, 순서 있는 `lanes`, `length`, `count`, `rolls`(초과 포함 주문별 총수량), `extra`, `note`를 가진다. `set_no`는 품목 내부 번호다. 어느 길이 부분문제라도 미해결이면 해당 품목 전체를 미배치로 보고하고 XLSX를 거부한다.
+- `[추정] F-02/F-03` M/R중량은 `총길이 × mr_width_factor × gsm / 1000`, 시간은 `중량 / divisor / k(gsm)`이다. 기본 `mr_width_factor=3.654`, `time_divisors=(27, {30~90:26, 15:21, 18:21, 100:21, 140:19})`. 표에 없는 gsm은 가장 가까운 표의 gsm에 해당하는 k를 사용하며, 동률이면 작은 gsm을 선택한다. `[추정] F-03: gsm {g} uses k of {nearest}` 경고를 남긴다. 빈 계수표는 거부한다. `mb_ratio`는 0~1 비율이며 같은 품목에서 일관되어야 한다. 없으면 MB량은 `None`이다. 결과는 `coefficients_estimated=true`다.
+
+**2단: 세트 블록을 바꾸지 않는 단일 설비 일정**
+- 공개 함수: `schedule(plan_result, *, t0, machine_state, frozen=(), blocked=(), rules_file=None, time_limit=30)`. 한 호출에 한 호기만 허용하며 1호기 현장 검증은 별도다. 색상은 품목 뒤 4자리, 평량은 그룹 gsm, 농업용은 UV/UB다. 작업 납기는 주문 `due` 최솟값, 착수 가능 시각은 `available_from` 최댓값, `urgent`는 하나라도 참이면 적용한다.
+- 시각은 ISO-8601이며 시간대 유무를 통일한다. 날짜만 주면 그 날짜 **00:00**로 해석한다. `ASAP` 같은 자연어 납기는 거부한다. `frozen=[{"job_id":"2TESTWH1N:1","start":"2026-01-01T08:00:00"}]`는 지정 순서의 **고정 prefix**다. 선택 `end`가 있으면 생산시간과 일치해야 한다. `blocked=[{"start":...,"end":...}]`에는 생산 작업이 겹치지 않는다. 정식화대로 전환은 시간차 제약이므로 **정대 중 전환까지 금지하는 모델은 아니다**.
+- CP-SAT 회로·작업 인터벌·NoOverlap. 정수 가중치 사전식 **긴급 가중 납기 지연 → 전환시간+CR 환산손실 → 완료 시각 → 평량 상승 횟수** 최소화. 색상 묶음은 연성 선호이며 긴급 납기로 깨질 수 있다. 솔버 설정은 시간 제한뿐이다(1단 부분문제별, 2단 전체).
+- 전환값은 명시한 `rules_file` → 모듈 옆 `transition_rules.json` → 내장 기본값 순으로 선택한다. 명시한 파일이 없거나 잘못된 경우는 오류이며 조용히 기본값으로 대체하지 않는다. JSON은 편집용으로 유지한다. 기본 명도 순서는 `WH NT UV UB AW CP IV LA LB LG BE YL PK OR GD MA BR RD DA DG DB UG BK`이며, 관측 계열의 추정 순서라 기준표 수령 시 교체한다. `[추정] S-05` 평량 차 Δ가 양수면 `0.0375 × max(0, Δ−30)`시간, 상승 계수는 기본 0, 농업용 조건 변경은 1h다. 같은 색·직전 100g에서 **100→60→30: 0.375h**, 직행 **100→30: 1.5h**. C-02 블랙→화이트는 5.5h·CR 6롤이다. 다른 진→연은 5.5h 추정, CR은 BK→WH에만 붙인다. 어느 쪽이든 명도표에 없는 색상 계열이면 같은 코드라도 보수적으로 `dark_to_light_h`(기본 5.5h)를 적용한다. 실제 미지 계열 목록과 `lightness_order 보완 필요` 경고를 남기며 CR은 여전히 BK→WH에만 붙인다.
+- 문서에 미지정된 목적 계수는 `[추정]`으로 `objective.urgent_weight=10`, `objective.cr_minutes_per_roll=60`을 둔다. CR 중량은 `cr_roll_kg=100` 임시값이다. 모두 현장 기준으로 교체해야 한다. 전환 출력 `delta_h`는 원계수 시간, 일정은 안전하게 **정수 분 올림**(`scheduled_minutes`)이므로 0.375h는 23분이다.
+- 출력은 순서·시작·종료·납기 지연이 있는 `jobs`, `transitions`, 전환시간/CR/지연 합계, `makespan_end`, 색상별 MB량과 경고다. MB 투입률이 없는 작업은 합계에서 제외하고 경고한다. `UNKNOWN`/`INFEASIBLE`이면 빈 일정·`complete=false`·합계 `None`이며 출력하지 않는다.
+
+**XLSX 및 검증**
+- `to_xlsx(result, template, out_path, sheet_name=None, schedule=None)`는 PP 구조 일치 시트를 복제하고 주문·재고 칸을 비운 뒤 색상 블록별 세트 순으로 채운다. 같은 세트 주문은 인접하며 세트 사이 한 행을 비운다. 없는 색상은 합계 앞에 마지막 블록 서식을 복사해 추가하고 결과 `warnings`에 `template has no block for {색상}; appended`를 남긴다. 블록 후보가 여러 개면 오류다. S열은 `(1300+950*2)*300 ×80세트 #세트1`, 초과 행에는 `초과 n롤 · 추가구매 권유`를 추가한다. `no_edge`의 내부 레인 순서는 표기에도 유지한다.
+- **세트표**는 반복 1회당이 아닌 **세트 블록당 한 행**이다. 열: 세트번호·품목코드·패턴·폭 합·로스(mm)·길이(m)·세트 수·주문별 롤수·M/R 길이·M/R 중량·생산시간(추정)·MB 소요량. `schedule=`을 주면 **스케줄표**(순번·품목코드·색상·gsm·패턴·길이·세트 수·롤수·M/R 길이·M/R 중량·생산시간·시작·종료·전환(h)·CR 롤·납기·지연(h))도 추가한다. 좌표 배열표는 만들지 않는다.
+- 원본/기존 출력/예약 시트는 덮어쓰지 않는다. 행 삽입 시 합계·색상 집계·병합 참조를 옮기고 Excel 재계산을 요청한다. **openpyxl은 수식을 실행하지 않는다.** `total_kg`는 제품 총중량이며 M/R중량과 구별한다.
+- 소스 체크아웃에서 실행: `../DB조회도구/.venv/bin/python test_hanilsf_plan.py`, `../DB조회도구/.venv/bin/python test_hanilsf_schedule.py`, `../DB조회도구/.venv/bin/python test_hanilsf_demo.py`. 합성 사례와 임시 사본으로 검증하며, 선택적 과거 스케줄 대조는 파일이 있고 보안 태그가 허용할 때만 수행한다. 스케줄 M열 저장값 대조와 지시서 연결·실제 생산시각 검증은 별개다.
 
 ### 입력 — 상품을 특정하는 dict
 

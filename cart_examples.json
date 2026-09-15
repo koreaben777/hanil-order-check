@@ -1,0 +1,2416 @@
+[
+ {
+  "id": "ex1",
+  "name": "예시 1 · 흰색 계열 27행",
+  "description": "WH·NT·IV·AW 계열만. 색상 전환 없이 폭 조합(1단)만 관찰",
+  "rows": [
+   {
+    "item": "2PD2038WH1N",
+    "width": 1230,
+    "length": 3200,
+    "rolls": 8,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050WH1N",
+    "width": 1200,
+    "length": 500,
+    "rolls": 10,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1000,
+    "length": 2000,
+    "rolls": 10,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 600,
+    "length": 1000,
+    "rolls": 30,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 300,
+    "length": 2000,
+    "rolls": 58,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 400,
+    "length": 2000,
+    "rolls": 24,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 800,
+    "length": 600,
+    "rolls": 148,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 900,
+    "length": 3200,
+    "rolls": 3,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1100,
+    "length": 1000,
+    "rolls": 87,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 560,
+    "length": 2000,
+    "rolls": 6,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 1300,
+    "length": 1000,
+    "rolls": 24,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2045WH1N",
+    "width": 1000,
+    "length": 1000,
+    "rolls": 60,
+    "gsm": 45,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 900,
+    "length": 300,
+    "rolls": 36,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 2300,
+    "length": 400,
+    "rolls": 72,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 840,
+    "length": 1000,
+    "rolls": 4,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 350,
+    "length": 1000,
+    "rolls": 96,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 260,
+    "length": 1500,
+    "rolls": 60,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090WH1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 32,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060WH1N",
+    "width": 900,
+    "length": 500,
+    "rolls": 20,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060WH1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 100,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH1N",
+    "width": 1110,
+    "length": 3000,
+    "rolls": 30,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040IV1N",
+    "width": 1000,
+    "length": 1000,
+    "rolls": 60,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060WH1N",
+    "width": 1100,
+    "length": 500,
+    "rolls": 21,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH2N",
+    "width": 1030,
+    "length": 1000,
+    "rolls": 3,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2045NT1N",
+    "width": 470,
+    "length": 500,
+    "rolls": 20,
+    "gsm": 45,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015NT1N",
+    "width": 1030,
+    "length": 1000,
+    "rolls": 36,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3140WH1N",
+    "width": 1520,
+    "length": 270,
+    "rolls": 40,
+    "gsm": 140,
+    "grade": "A"
+   }
+  ],
+  "stats": {
+   "rows": 27,
+   "items": 15,
+   "rolls": 1098,
+   "colors": 4
+  },
+  "source": "PP 생산의뢰서 2026-07 회차 파일의 규격(품목코드·폭·길이·롤수·평량)만 무작위 추출·같은 규격 합산. 거래처·용도·납기 없음"
+ },
+ {
+  "id": "ex2",
+  "name": "예시 2 · 혼합 40행",
+  "description": "의뢰서 전체에서 무작위 40행. 색상 3~6종, 1·2단 기본 동작",
+  "rows": [
+   {
+    "item": "2PD3060WH1N",
+    "width": 900,
+    "length": 500,
+    "rolls": 40,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2014WH2N",
+    "width": 1240,
+    "length": 5000,
+    "rolls": 5,
+    "gsm": 14,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1000,
+    "length": 2000,
+    "rolls": 37,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 800,
+    "length": 600,
+    "rolls": 148,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040BK1N",
+    "width": 1100,
+    "length": 500,
+    "rolls": 30,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060BK1N",
+    "width": 1200,
+    "length": 300,
+    "rolls": 40,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055BK1N",
+    "width": 1430,
+    "length": 300,
+    "rolls": 40,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055BK1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 60,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1470,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 2300,
+    "length": 400,
+    "rolls": 48,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035NT1N",
+    "width": 1050,
+    "length": 2500,
+    "rolls": 131,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2045NT1N",
+    "width": 970,
+    "length": 500,
+    "rolls": 60,
+    "gsm": 45,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1100,
+    "length": 1000,
+    "rolls": 60,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2020BK1N",
+    "width": 1300,
+    "length": 1000,
+    "rolls": 30,
+    "gsm": 20,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK1N",
+    "width": 1100,
+    "length": 500,
+    "rolls": 30,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1030,
+    "length": 1000,
+    "rolls": 18,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 1200,
+    "length": 300,
+    "rolls": 36,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH1N",
+    "width": 1200,
+    "length": 6000,
+    "rolls": 28,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070RD1N",
+    "width": 850,
+    "length": 600,
+    "rolls": 86,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3100WH1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 60,
+    "gsm": 100,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050WH1N",
+    "width": 260,
+    "length": 1000,
+    "rolls": 108,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2014WH2N",
+    "width": 1400,
+    "length": 5000,
+    "rolls": 20,
+    "gsm": 14,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2047WH3F",
+    "width": 660,
+    "length": 3000,
+    "rolls": 3,
+    "gsm": 47,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060BK1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 40,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1230,
+    "length": 3200,
+    "rolls": 8,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 950,
+    "length": 300,
+    "rolls": 60,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2020WH2N",
+    "width": 220,
+    "length": 4000,
+    "rolls": 45,
+    "gsm": 20,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 900,
+    "length": 2000,
+    "rolls": 43,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 930,
+    "length": 500,
+    "rolls": 40,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 240,
+    "length": 2000,
+    "rolls": 78,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 750,
+    "length": 2000,
+    "rolls": 32,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 600,
+    "length": 1000,
+    "rolls": 95,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 900,
+    "length": 300,
+    "rolls": 120,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3100BK3F",
+    "width": 1100,
+    "length": 300,
+    "rolls": 48,
+    "gsm": 100,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015NT1N",
+    "width": 760,
+    "length": 1000,
+    "rolls": 8,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1100,
+    "length": 2000,
+    "rolls": 18,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH1N",
+    "width": 1100,
+    "length": 6000,
+    "rolls": 21,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060DB1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 40,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1100,
+    "length": 400,
+    "rolls": 24,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090MA1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 60,
+    "gsm": 90,
+    "grade": "A"
+   }
+  ],
+  "stats": {
+   "rows": 40,
+   "items": 25,
+   "rolls": 1928,
+   "colors": 9
+  },
+  "source": "PP 생산의뢰서 2026-07 회차 파일의 규격(품목코드·폭·길이·롤수·평량)만 무작위 추출·같은 규격 합산. 거래처·용도·납기 없음"
+ },
+ {
+  "id": "ex3",
+  "name": "예시 3 · 진한 색 위주 54행",
+  "description": "BK·DB·BR·RD 등 진한 색 비중을 높인 54행. 연→진 순서와 블랙→화이트 CR 관찰",
+  "rows": [
+   {
+    "item": "2PD3070RD1N",
+    "width": 750,
+    "length": 1800,
+    "rolls": 30,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070DB1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 40,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1230,
+    "length": 300,
+    "rolls": 121,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040BK3F",
+    "width": 1100,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1300,
+    "length": 300,
+    "rolls": 144,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090BK1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK1N",
+    "width": 1600,
+    "length": 500,
+    "rolls": 10,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1470,
+    "length": 300,
+    "rolls": 60,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055BK1N",
+    "width": 1200,
+    "length": 300,
+    "rolls": 60,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 790,
+    "length": 500,
+    "rolls": 18,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090MA1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1110,
+    "length": 300,
+    "rolls": 180,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 900,
+    "length": 300,
+    "rolls": 100,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070BK1N",
+    "width": 1070,
+    "length": 300,
+    "rolls": 36,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070BK1N",
+    "width": 600,
+    "length": 300,
+    "rolls": 50,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070RD1N",
+    "width": 850,
+    "length": 600,
+    "rolls": 86,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090BR2N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 20,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070BR2N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 40,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 930,
+    "length": 500,
+    "rolls": 206,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060MA1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 90,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055BK1N",
+    "width": 1430,
+    "length": 300,
+    "rolls": 10,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040BK1N",
+    "width": 1100,
+    "length": 500,
+    "rolls": 30,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040BK1N",
+    "width": 1000,
+    "length": 1000,
+    "rolls": 20,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060DB1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 80,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3080BK3F",
+    "width": 1100,
+    "length": 300,
+    "rolls": 32,
+    "gsm": 80,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055BK1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070MA1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 20,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3100BK3F",
+    "width": 950,
+    "length": 300,
+    "rolls": 128,
+    "gsm": 100,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1050,
+    "length": 500,
+    "rolls": 20,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055BK1N",
+    "width": 1600,
+    "length": 300,
+    "rolls": 10,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3140WH1N",
+    "width": 1520,
+    "length": 270,
+    "rolls": 40,
+    "gsm": 140,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1100,
+    "length": 2000,
+    "rolls": 10,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2020WH2N",
+    "width": 1580,
+    "length": 2000,
+    "rolls": 16,
+    "gsm": 20,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 560,
+    "length": 2000,
+    "rolls": 6,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 260,
+    "length": 1500,
+    "rolls": 60,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090WH1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 72,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2020WH1N",
+    "width": 1580,
+    "length": 2000,
+    "rolls": 16,
+    "gsm": 20,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 625,
+    "length": 3000,
+    "rolls": 80,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2045WH1N",
+    "width": 1200,
+    "length": 1000,
+    "rolls": 40,
+    "gsm": 45,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060WH1N",
+    "width": 1100,
+    "length": 500,
+    "rolls": 20,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1230,
+    "length": 3200,
+    "rolls": 6,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030AW1N",
+    "width": 400,
+    "length": 2000,
+    "rolls": 300,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH1N",
+    "width": 1110,
+    "length": 3000,
+    "rolls": 33,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1280,
+    "length": 3000,
+    "rolls": 2,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH2N",
+    "width": 600,
+    "length": 1000,
+    "rolls": 95,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 530,
+    "length": 1000,
+    "rolls": 18,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 520,
+    "length": 500,
+    "rolls": 72,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 900,
+    "length": 3200,
+    "rolls": 3,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1500,
+    "length": 2000,
+    "rolls": 10,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 1070,
+    "length": 300,
+    "rolls": 36,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 100,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040NT1N",
+    "width": 1070,
+    "length": 2000,
+    "rolls": 48,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 2300,
+    "length": 400,
+    "rolls": 24,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 700,
+    "length": 2000,
+    "rolls": 30,
+    "gsm": 38,
+    "grade": "A"
+   }
+  ],
+  "stats": {
+   "rows": 54,
+   "items": 31,
+   "rolls": 2898,
+   "colors": 10
+  },
+  "source": "PP 생산의뢰서 2026-07 회차 파일의 규격(품목코드·폭·길이·롤수·평량)만 무작위 추출·같은 규격 합산. 거래처·용도·납기 없음"
+ },
+ {
+  "id": "ex4",
+  "name": "예시 4 · 무작위 73행",
+  "description": "의뢰서 전체에서 무작위 73행. 작업 수가 많아 2단이 시간 제한에 걸리는 모습 관찰",
+  "rows": [
+   {
+    "item": "2PD3120WH1N",
+    "width": 1100,
+    "length": 550,
+    "rolls": 15,
+    "gsm": 120,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH2N",
+    "width": 600,
+    "length": 1000,
+    "rolls": 20,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2020WH1N",
+    "width": 530,
+    "length": 3000,
+    "rolls": 28,
+    "gsm": 20,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1200,
+    "length": 1000,
+    "rolls": 27,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 800,
+    "length": 300,
+    "rolls": 132,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090MA1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 60,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1230,
+    "length": 3200,
+    "rolls": 6,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 1000,
+    "length": 500,
+    "rolls": 20,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055BK1N",
+    "width": 1200,
+    "length": 300,
+    "rolls": 20,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3100BK3F",
+    "width": 950,
+    "length": 300,
+    "rolls": 32,
+    "gsm": 100,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070BK1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 106,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090BK1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 60,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 900,
+    "length": 3200,
+    "rolls": 3,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 350,
+    "length": 1000,
+    "rolls": 96,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2020WH1N",
+    "width": 1600,
+    "length": 3000,
+    "rolls": 22,
+    "gsm": 20,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 520,
+    "length": 500,
+    "rolls": 144,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 900,
+    "length": 300,
+    "rolls": 60,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 630,
+    "length": 500,
+    "rolls": 98,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 750,
+    "length": 2000,
+    "rolls": 32,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3140WH1N",
+    "width": 1520,
+    "length": 270,
+    "rolls": 20,
+    "gsm": 140,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 650,
+    "length": 1000,
+    "rolls": 60,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3100WH1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 36,
+    "gsm": 100,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1060,
+    "length": 900,
+    "rolls": 64,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2045WH1N",
+    "width": 1000,
+    "length": 1000,
+    "rolls": 80,
+    "gsm": 45,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1100,
+    "length": 2000,
+    "rolls": 10,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060BK1N",
+    "width": 915,
+    "length": 3000,
+    "rolls": 9,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060IV1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 60,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 650,
+    "length": 1500,
+    "rolls": 20,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1300,
+    "length": 300,
+    "rolls": 144,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060BK3F",
+    "width": 1100,
+    "length": 300,
+    "rolls": 42,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3100BK1N",
+    "width": 1600,
+    "length": 300,
+    "rolls": 18,
+    "gsm": 100,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 800,
+    "length": 600,
+    "rolls": 148,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 930,
+    "length": 500,
+    "rolls": 40,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2018BK3F",
+    "width": 1120,
+    "length": 2000,
+    "rolls": 30,
+    "gsm": 18,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1470,
+    "length": 300,
+    "rolls": 210,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1100,
+    "length": 400,
+    "rolls": 24,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090DB1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 100,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1230,
+    "length": 300,
+    "rolls": 101,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055WH2N",
+    "width": 290,
+    "length": 1000,
+    "rolls": 30,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1500,
+    "length": 2000,
+    "rolls": 24,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 770,
+    "length": 1000,
+    "rolls": 302,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1280,
+    "length": 300,
+    "rolls": 20,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070DB1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 80,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2020WH2N",
+    "width": 220,
+    "length": 4000,
+    "rolls": 45,
+    "gsm": 20,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040NT1N",
+    "width": 1070,
+    "length": 2000,
+    "rolls": 150,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060WH1N",
+    "width": 800,
+    "length": 500,
+    "rolls": 20,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 2300,
+    "length": 400,
+    "rolls": 48,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1220,
+    "length": 2000,
+    "rolls": 20,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060MA1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1250,
+    "length": 300,
+    "rolls": 10,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060WH1N",
+    "width": 1100,
+    "length": 500,
+    "rolls": 21,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040BK1N",
+    "width": 1500,
+    "length": 500,
+    "rolls": 18,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090BK1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 500,
+    "length": 2000,
+    "rolls": 30,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3080WH1N",
+    "width": 340,
+    "length": 400,
+    "rolls": 87,
+    "gsm": 80,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 1580,
+    "length": 1000,
+    "rolls": 32,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2047WH3F",
+    "width": 660,
+    "length": 3000,
+    "rolls": 3,
+    "gsm": 47,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040BK1N",
+    "width": 1100,
+    "length": 500,
+    "rolls": 30,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015NT1N",
+    "width": 1030,
+    "length": 1000,
+    "rolls": 36,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070RD1N",
+    "width": 850,
+    "length": 600,
+    "rolls": 86,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060BK1N",
+    "width": 1200,
+    "length": 300,
+    "rolls": 40,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070RD1N",
+    "width": 800,
+    "length": 600,
+    "rolls": 148,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH1N",
+    "width": 1110,
+    "length": 3000,
+    "rolls": 33,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 700,
+    "length": 2000,
+    "rolls": 30,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 560,
+    "length": 2000,
+    "rolls": 6,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1050,
+    "length": 500,
+    "rolls": 20,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1430,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 750,
+    "length": 3000,
+    "rolls": 3,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060IV1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 360,
+    "length": 1000,
+    "rolls": 40,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2014WH1N",
+    "width": 1400,
+    "length": 5000,
+    "rolls": 32,
+    "gsm": 14,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH1N",
+    "width": 1100,
+    "length": 3000,
+    "rolls": 30,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1000,
+    "length": 1000,
+    "rolls": 20,
+    "gsm": 40,
+    "grade": "A"
+   }
+  ],
+  "stats": {
+   "rows": 73,
+   "items": 36,
+   "rolls": 3811,
+   "colors": 10
+  },
+  "source": "PP 생산의뢰서 2026-07 회차 파일의 규격(품목코드·폭·길이·롤수·평량)만 무작위 추출·같은 규격 합산. 거래처·용도·납기 없음"
+ },
+ {
+  "id": "ex5",
+  "name": "예시 5 · 대량 99행",
+  "description": "의뢰서 전체에서 무작위 99행. 대량 집합의 1단 분해·2단 FEASIBLE 확인",
+  "rows": [
+   {
+    "item": "2PD3060BR2N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 40,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1100,
+    "length": 500,
+    "rolls": 40,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK1N",
+    "width": 1600,
+    "length": 500,
+    "rolls": 10,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038LB4N",
+    "width": 625,
+    "length": 3000,
+    "rolls": 100,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070BK1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 96,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3080WH1N",
+    "width": 340,
+    "length": 400,
+    "rolls": 87,
+    "gsm": 80,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1000,
+    "length": 2000,
+    "rolls": 32,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 620,
+    "length": 1100,
+    "rolls": 25,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 710,
+    "length": 500,
+    "rolls": 206,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070BE2N",
+    "width": 1600,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2014WH2N",
+    "width": 1240,
+    "length": 5000,
+    "rolls": 5,
+    "gsm": 14,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035NT1N",
+    "width": 1030,
+    "length": 500,
+    "rolls": 99,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 900,
+    "length": 300,
+    "rolls": 212,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2018WH2N",
+    "width": 1520,
+    "length": 1000,
+    "rolls": 200,
+    "gsm": 18,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3100WH1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 60,
+    "gsm": 100,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH2N",
+    "width": 600,
+    "length": 1000,
+    "rolls": 20,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH1N",
+    "width": 1110,
+    "length": 3000,
+    "rolls": 15,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 930,
+    "length": 500,
+    "rolls": 206,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH2N",
+    "width": 1030,
+    "length": 1000,
+    "rolls": 3,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 770,
+    "length": 1000,
+    "rolls": 340,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040BK1N",
+    "width": 1000,
+    "length": 1000,
+    "rolls": 20,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 630,
+    "length": 500,
+    "rolls": 138,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055BK1N",
+    "width": 1200,
+    "length": 300,
+    "rolls": 20,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1390,
+    "length": 300,
+    "rolls": 160,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 300,
+    "length": 2000,
+    "rolls": 53,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 900,
+    "length": 3200,
+    "rolls": 3,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090BR2N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 120,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060IV1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 500,
+    "length": 2000,
+    "rolls": 20,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3100BK3F",
+    "width": 1100,
+    "length": 300,
+    "rolls": 48,
+    "gsm": 100,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 2350,
+    "length": 400,
+    "rolls": 48,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2020BK1N",
+    "width": 950,
+    "length": 1000,
+    "rolls": 30,
+    "gsm": 20,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060DB1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 40,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1200,
+    "length": 1000,
+    "rolls": 5,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 1580,
+    "length": 1000,
+    "rolls": 32,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090BR2N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 20,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090WH1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 204,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1300,
+    "length": 300,
+    "rolls": 80,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1100,
+    "length": 1000,
+    "rolls": 67,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1100,
+    "length": 2000,
+    "rolls": 20,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1430,
+    "length": 300,
+    "rolls": 50,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035NT1N",
+    "width": 800,
+    "length": 2500,
+    "rolls": 60,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2020WH2N",
+    "width": 250,
+    "length": 2000,
+    "rolls": 208,
+    "gsm": 20,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 1000,
+    "length": 500,
+    "rolls": 90,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH2N",
+    "width": 250,
+    "length": 1500,
+    "rolls": 72,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 2300,
+    "length": 400,
+    "rolls": 72,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH2N",
+    "width": 2800,
+    "length": 1000,
+    "rolls": 20,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2028WH1N",
+    "width": 750,
+    "length": 2000,
+    "rolls": 108,
+    "gsm": 28,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090DB1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 50,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090MA1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 625,
+    "length": 3000,
+    "rolls": 60,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055BK1N",
+    "width": 1430,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 400,
+    "length": 2000,
+    "rolls": 24,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070RD1N",
+    "width": 800,
+    "length": 600,
+    "rolls": 234,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090BK1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH1N",
+    "width": 1100,
+    "length": 3000,
+    "rolls": 30,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2047WH3F",
+    "width": 660,
+    "length": 3000,
+    "rolls": 3,
+    "gsm": 47,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060MA1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060BK1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070BK1N",
+    "width": 600,
+    "length": 300,
+    "rolls": 50,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060WH1N",
+    "width": 1600,
+    "length": 300,
+    "rolls": 18,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 360,
+    "length": 1500,
+    "rolls": 108,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2045NT1N",
+    "width": 550,
+    "length": 1000,
+    "rolls": 60,
+    "gsm": 45,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055BK1N",
+    "width": 1600,
+    "length": 300,
+    "rolls": 10,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070BK1N",
+    "width": 2000,
+    "length": 300,
+    "rolls": 10,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1280,
+    "length": 300,
+    "rolls": 210,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 600,
+    "length": 1500,
+    "rolls": 20,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2045BK3F",
+    "width": 1420,
+    "length": 3000,
+    "rolls": 7,
+    "gsm": 45,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1060,
+    "length": 900,
+    "rolls": 24,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3120WH1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 120,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090LB1N",
+    "width": 1100,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060WH1N",
+    "width": 1500,
+    "length": 500,
+    "rolls": 20,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3085BR2N",
+    "width": 1600,
+    "length": 300,
+    "rolls": 25,
+    "gsm": 85,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1230,
+    "length": 300,
+    "rolls": 121,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1000,
+    "length": 1000,
+    "rolls": 20,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1470,
+    "length": 300,
+    "rolls": 240,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040IV1N",
+    "width": 1200,
+    "length": 1000,
+    "rolls": 30,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 800,
+    "length": 600,
+    "rolls": 60,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 660,
+    "length": 1000,
+    "rolls": 100,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 760,
+    "length": 500,
+    "rolls": 40,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 950,
+    "length": 300,
+    "rolls": 288,
+    "gsm": 50,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2020WH1N",
+    "width": 1700,
+    "length": 3000,
+    "rolls": 8,
+    "gsm": 20,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2038WH1N",
+    "width": 1220,
+    "length": 2000,
+    "rolls": 10,
+    "gsm": 38,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060BK1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 30,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3060WH1N",
+    "width": 800,
+    "length": 500,
+    "rolls": 20,
+    "gsm": 60,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3100BK3F",
+    "width": 950,
+    "length": 300,
+    "rolls": 96,
+    "gsm": 100,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3090DB1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 100,
+    "gsm": 90,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3070WH1N",
+    "width": 1000,
+    "length": 500,
+    "rolls": 20,
+    "gsm": 70,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2015WH1N",
+    "width": 960,
+    "length": 6000,
+    "rolls": 14,
+    "gsm": 15,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030BK1N",
+    "width": 1600,
+    "length": 1000,
+    "rolls": 20,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2030WH1N",
+    "width": 300,
+    "length": 1500,
+    "rolls": 40,
+    "gsm": 30,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 1500,
+    "length": 2000,
+    "rolls": 24,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 600,
+    "length": 1000,
+    "rolls": 95,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2035WH1N",
+    "width": 350,
+    "length": 1000,
+    "rolls": 96,
+    "gsm": 35,
+    "grade": "A"
+   },
+   {
+    "item": "2PD3080BK3F",
+    "width": 1100,
+    "length": 300,
+    "rolls": 32,
+    "gsm": 80,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2040WH1N",
+    "width": 900,
+    "length": 1000,
+    "rolls": 20,
+    "gsm": 40,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2055BK1N",
+    "width": 1000,
+    "length": 300,
+    "rolls": 40,
+    "gsm": 55,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2020WH1N",
+    "width": 2330,
+    "length": 3000,
+    "rolls": 14,
+    "gsm": 20,
+    "grade": "A"
+   },
+   {
+    "item": "2PD2050BK3F",
+    "width": 1110,
+    "length": 300,
+    "rolls": 180,
+    "gsm": 50,
+    "grade": "A"
+   }
+  ],
+  "stats": {
+   "rows": 99,
+   "items": 46,
+   "rolls": 6595,
+   "colors": 14
+  },
+  "source": "PP 생산의뢰서 2026-07 회차 파일의 규격(품목코드·폭·길이·롤수·평량)만 무작위 추출·같은 규격 합산. 거래처·용도·납기 없음"
+ }
+]

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>주문 판단 — 의령공장 1·2호기</title>
+<title>주문 판단 · 생산 계획 — 의령공장 1·2호기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -27,7 +27,7 @@
   .cap{font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;color:var(--muted)}
   .grid{display:grid;grid-template-columns:360px 1fr;gap:24px;align-items:start}
   @media (max-width:900px){.grid{grid-template-columns:1fr}}
-  .card{background:var(--card);border-radius:var(--r-xl);padding:24px;border:1px solid var(--line-soft)}
+  .card{background:var(--card);border-radius:var(--r-xl);padding:24px;border:1px solid var(--line-soft);overflow-x:auto}
   .grid>div{display:grid;gap:24px;align-content:start}   /* 열 안의 카드·그룹 간격은 여기서만 */
   .card h2{margin:0 0 16px;color:var(--ink);font-size:16px;font-weight:600}
   label{display:block;margin:12px 0 6px;font-size:13px;color:var(--muted)}
@@ -70,6 +70,17 @@
   .rule{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
   .dim{color:var(--muted-soft)}
   .split{display:grid;grid-template-columns:1fr 1fr;gap:24px} @media (max-width:1200px){.split{grid-template-columns:1fr}}
+  .tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+  .tab{height:36px;padding:0 16px;border-radius:9999px;border:1px solid var(--line-strong);background:var(--card-2);color:var(--body);font:500 13px var(--sans);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .tab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+  .tab .cnt{background:rgba(255,255,255,.14);border-radius:9999px;padding:0 8px;font-size:11px;line-height:20px;font-family:var(--mono)}
+  [hidden]{display:none!important}
+  input.cell{height:32px;padding:0 8px;width:84px;text-align:right}
+  .tiles.wide{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .warn{margin:12px 0 0;padding-left:18px;font-size:12px;color:var(--muted)} .warn li{margin:2px 0}
+  .x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:16px;line-height:1} .x:hover{color:var(--err)}
+  .cartbtn{margin-top:12px}
+  .exrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px} .exrow select{width:auto;min-width:260px;max-width:100%}
 </style>
 </head>
 <body>
@@ -84,6 +95,12 @@
 
   <div class="err" id="err"></div>
 
+  <div class="tabs">
+    <button class="tab on" type="button" id="tabbtn-check">① 주문 입력 · 판단</button>
+    <button class="tab" type="button" id="tabbtn-opt">② 생산 정의 → ③ 생산 계획 <span class="cnt" id="cartcnt">0</span></button>
+  </div>
+
+  <div id="tab-check">
   <div class="grid">
     <div>
       <form class="card" id="f" autocomplete="off">
@@ -131,6 +148,43 @@
     </div>
 
     <div id="out"><div class="card"><div class="empty">주문을 입력하고 <b>판단하기</b>를 누르세요.</div></div></div>
+  </div>
+  </div>
+
+  <div id="tab-opt" hidden>
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2>③ 생산 계획 설정</h2>
+        <label>적용 시작 시각 (t0)</label><input type="datetime-local" id="o_t0">
+        <div class="row">
+          <div><label>직전 색상코드</label><input class="mono" id="o_color" value="WH1N" maxlength="4"></div>
+          <div><label>직전 평량 (g/㎡)</label><input type="number" id="o_gsm" value="40" min="1"></div>
+        </div>
+        <div class="row">
+          <div><label>직전 농업용 여부</label><select id="o_agri"><option value="0">아니오</option><option value="1">예</option></select></div>
+          <div><label>시간 제한 (초, 단계별)</label><input type="number" id="o_limit" value="120" min="1" max="600"></div>
+        </div>
+        <div class="actions">
+          <button class="btn" type="button" id="o_run">최적화 실행</button>
+          <button class="btn ghost" type="button" id="o_clear">비우기</button>
+        </div>
+        <div class="hint">장바구니의 생산의뢰분을 모아 1단(품목·길이별 슬리팅 세트, 총 길이 최소)과 2단(색상·중량·납기 순서, 전환 손실 최소)을 차례로 풉니다. 계수는 현장 기준표 수령 전 추정값이며 세트 구조는 구두 확인 전입니다.</div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h2>② 생산 정의 — 생산 필요분 집합 <span class="dim" style="font-weight:400;font-size:13px">주문 판단을 여러 번 실행해 담습니다 · 같은 규격은 롤수 합산</span></h2>
+        <div class="exrow">
+          <select id="exsel"><option value="">예시 생산 집합 선택…</option></select>
+          <button class="btn ghost" type="button" id="exadd" disabled>예시 담기</button>
+          <span class="hint" id="exhint" style="margin:0"></span>
+        </div>
+        <div id="cart"></div>
+      </div>
+      <div id="optout"></div>
+    </div>
+  </div>
   </div>
 </div>
 
@@ -256,7 +310,8 @@ function render(r) {
     <div class="tiles">
       <div class="tile"><div class="cap"><span class="dot" style="background:var(--glow)"></span>재고출하</div><div class="n">${r.stock_rolls}롤</div><div class="p">${pct(r.stock_rolls)}% · ${fmt(r.stock_rolls * r.roll_kg)} kg</div></div>
       <div class="tile"><div class="cap"><span class="dot" style="background:var(--cyan)"></span>대체검토</div><div class="n">${r.sub_rolls}롤</div><div class="p">${pct(r.sub_rolls)}% · 영업 판단</div></div>
-      <div class="tile"><div class="cap"><span class="dot" style="background:var(--violet)"></span>생산의뢰</div><div class="n">${r.prod_rolls}롤</div><div class="p">${pct(r.prod_rolls)}% · ${fmt(r.prod_rolls * r.roll_kg)} kg</div></div>
+      <div class="tile"><div class="cap"><span class="dot" style="background:var(--violet)"></span>생산의뢰</div><div class="n">${r.prod_rolls}롤</div><div class="p">${pct(r.prod_rolls)}% · ${fmt(r.prod_rolls * r.roll_kg)} kg</div>
+        ${r.prod_rolls > 0 ? `<button class="btn ghost cartbtn" type="button" id="addcart">생산 필요분 ${r.prod_rolls}롤 담기</button>` : ''}</div>
     </div>
     <div class="stock">
       <div>현재고 동일규격 <b>${r.onhand_rolls}롤</b> / ${fmt(r.onhand_kg)} kg</div>
@@ -277,7 +332,113 @@ function render(r) {
     <div class="card"><h2>최근 14일 생산요청 <span class="dim" style="font-weight:400;font-size:13px">품목 단위</span></h2>
       ${prq ? `<table><thead><tr><th>요청번호</th><th>납기</th><th class="num">요청 kg</th><th class="num">작업 kg</th><th>수주</th></tr></thead><tbody>${prq}</tbody></table>` : '<div class="dim">없음</div>'}</div>
   </div>`;
+  const b = $('addcart'); if (b) b.addEventListener('click', () => addToCart(r));
 }
+
+// ---- 생산 최적화 탭: 장바구니(localStorage) → /api/optimize ----
+const CART_KEY = 'hanilsf_cart';
+let cart = [];
+try { cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (e) { cart = []; }
+function showTab(name) {
+  $('tab-check').hidden = name !== 'check'; $('tab-opt').hidden = name !== 'opt';
+  $('tabbtn-check').classList.toggle('on', name === 'check'); $('tabbtn-opt').classList.toggle('on', name === 'opt');
+}
+$('tabbtn-check').addEventListener('click', () => showTab('check'));
+$('tabbtn-opt').addEventListener('click', () => showTab('opt'));
+function saveCart() { try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) { /* 저장 불가 시 메모리만 */ } $('cartcnt').textContent = cart.length; renderCart(); }
+function addToCart(r) {
+  const o = r.order, m = r.master || {};
+  const key = [o.item, o.width, o.length, o.grade, o.partner || ''].join('|');
+  const hit = cart.find(c => c.key === key);
+  if (hit) hit.rolls += r.prod_rolls;
+  else cart.push({key, item: o.item, name: m.NM_ITEM || '', width: o.width, length: o.length, grade: o.grade, partner: o.partner || '', gsm: m.gsm != null ? Number(m.gsm) : null, rolls: r.prod_rolls, roll_kg: r.roll_kg});
+  saveCart(); showTab('opt');
+}
+function renderCart() {
+  if (!cart.length) { $('cart').innerHTML = '<div class="empty">비어 있습니다. 주문 판단 결과의 <b>생산 필요분 담기</b>를 누르세요.</div>'; return; }
+  const rows = cart.map((c, i) => `<tr><td class="mono">${esc(c.item)}<div class="dim" style="font-family:var(--sans)">${esc(c.name)}</div></td>
+    <td class="mono">${c.width}×${c.length} ${esc(c.grade)}</td><td class="mono">${esc(c.partner) || '<span class="dim">—</span>'}</td><td class="num">${c.gsm ?? '<span class="dim">?</span>'}</td>
+    <td class="num"><input class="cell" type="number" min="1" value="${c.rolls}" data-i="${i}"></td><td class="num">${fmt(c.rolls * (c.roll_kg || 0))}</td>
+    <td><button class="x" type="button" data-del="${i}" title="빼기">×</button></td></tr>`).join('');
+  const kg = cart.reduce((a, c) => a + c.rolls * (c.roll_kg || 0), 0), rolls = cart.reduce((a, c) => a + c.rolls, 0);
+  $('cart').innerHTML = `<table><thead><tr><th>품목</th><th>규격</th><th>거래처</th><th class="num">평량</th><th class="num">롤수</th><th class="num">kg</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="hint">${cart.length}건 · ${rolls}롤 · ${fmt(kg)} kg</div>`;
+  $('cart').querySelectorAll('input.cell').forEach(el => el.addEventListener('change', () => { const v = parseInt(el.value, 10); if (v > 0) { cart[+el.dataset.i].rolls = v; saveCart(); } else renderCart(); }));
+  $('cart').querySelectorAll('button[data-del]').forEach(el => el.addEventListener('click', () => { cart.splice(+el.dataset.del, 1); saveCart(); }));
+}
+$('o_clear').addEventListener('click', () => { cart = []; saveCart(); $('optout').innerHTML = ''; });
+
+// 예시 생산 집합 (cart_examples.json) — 드롭다운에서 고르고 담는다
+let examples = [];
+async function loadExamples() {
+  try { examples = await api('/api/examples'); } catch (e) { examples = []; }
+  $('exsel').innerHTML = '<option value="">예시 생산 집합 선택…</option>' + examples.map(e => `<option value="${esc(e.id)}">${esc(e.name)} — ${e.rows.length}행 · ${e.stats ? e.stats.items + '품목 · ' + fmt(e.stats.rolls, 0) + '롤' : ''}</option>`).join('');
+  $('exadd').disabled = !examples.length;
+}
+$('exsel').addEventListener('change', () => { const e = examples.find(x => x.id === $('exsel').value); $('exhint').textContent = e ? e.description : ''; });
+$('exadd').addEventListener('click', () => {
+  const e = examples.find(x => x.id === $('exsel').value);
+  if (!e) { showErr('예시를 먼저 고르세요.'); return; }
+  showErr('');
+  for (const r of e.rows) {
+    const key = [r.item, r.width, r.length, r.grade || 'A', ''].join('|');
+    const hit = cart.find(c => c.key === key);
+    if (hit) hit.rolls += r.rolls;
+    else cart.push({key, item: r.item, name: e.name, width: r.width, length: r.length, grade: r.grade || 'A', partner: '', gsm: r.gsm, rolls: r.rolls, roll_kg: r.width / 1000 * r.length * r.gsm / 1000});
+  }
+  saveCart(); $('exhint').textContent = `${e.name} ${e.rows.length}행을 담았습니다.`;
+});
+loadExamples();
+(() => { const d = new Date(Date.now() + 864e5); d.setHours(0, 0, 0, 0); const z = n => String(n).padStart(2, '0'); $('o_t0').value = `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}T00:00`; })();
+const hhmm = iso => iso ? iso.slice(5, 16).replace('T', ' ') : '—';
+$('o_run').addEventListener('click', async () => {
+  if (!cart.length) { showErr('장바구니가 비어 있습니다.'); return; }
+  const body = {requests: cart.map((c, i) => ({order_id: 'C' + (i + 1), item: c.item, width: c.width, length: c.length, grade: c.grade, rolls: c.rolls, gsm: c.gsm, partner: c.partner || undefined})),
+    t0: $('o_t0').value, machine_state: {color_code: cleanCode($('o_color').value), gsm: +$('o_gsm').value, agri: $('o_agri').value === '1'}, time_limit: +$('o_limit').value || 120};
+  $('o_run').disabled = true; $('o_run').textContent = '계산 중…'; showErr('');
+  $('optout').innerHTML = '<div class="card"><div class="empty">1단 세트 계획과 2단 순서를 푸는 중입니다. 2단은 시간 제한(기본 120초)까지 걸릴 수 있습니다.</div></div>';
+  try { renderOpt(await api('/api/optimize', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)})); }
+  catch (e) { showErr('최적화 실패: ' + e.message); $('optout').innerHTML = ''; }
+  finally { $('o_run').disabled = false; $('o_run').textContent = '최적화 실행'; }
+});
+function renderOpt(r) {
+  const p = r.plan, s = r.schedule, tag = c => `<span class="badge ${{OPTIMAL: 'b-ok', FEASIBLE: 'b-temp'}[c] || 'b-prod'}">${esc(c)}</span>`;
+  const label = Object.fromEntries(cart.map((c, i) => ['C' + (i + 1), `${c.item} ${c.width}×${c.length}`]));
+  const sets = p.groups.flatMap(g => g.sets.map(st => `<tr><td class="mono">${esc(g.item)}</td><td class="num">${st.set_no}</td><td class="mono">(${esc(st.pattern)})*${st.length} ×${st.count}</td>
+      <td class="num">${st.width_sum}<span class="dim"> / ${g.eff_width}</span></td><td class="num">${st.loss_mm}</td><td class="num">${fmt(st.mr_length_m, 0)}</td><td class="num">${st.production_hours == null ? '—' : fmt(st.production_hours, 2)}</td>
+      <td>${Object.entries(st.rolls).map(([k, n]) => `<span class="mono" title="${esc(label[k] || k)}">${esc(k)}×${n}${st.extra && st.extra[k] ? '<span class="dim">(+' + st.extra[k] + ')</span>' : ''}</span>`).join(' ')}</td></tr>`));
+  const bad = p.groups.filter(g => !['OPTIMAL', 'FEASIBLE'].includes(g.status)).map(g => `<span class="mono">${esc(g.item)}</span> ${tag(g.status)}`).join(' ');
+  const sum = (arr, k) => arr.reduce((a, x) => a + (x[k] || 0), 0);
+  let head = `<div class="card"><h2>③ 생산 계획 — 1단 세트 계획 ${bad ? '' : tag(p.groups.every(g => g.status === 'OPTIMAL') ? 'OPTIMAL' : 'FEASIBLE')}</h2>
+    <div class="tiles wide">
+      <div class="tile"><div class="cap">품목</div><div class="n">${p.groups.length}</div><div class="p">길이별 부분문제로 분해</div></div>
+      <div class="tile"><div class="cap">세트</div><div class="n">${sum(p.groups, 'sets_used')}</div><div class="p">하한 ${sum(p.groups, 'lower_bound_sets')}</div></div>
+      <div class="tile"><div class="cap">총 생산 길이</div><div class="n">${fmt(sum(p.groups, 'total_length'), 0)}<span class="p"> m</span></div><div class="p">M/R 중량 ${fmt(sum(p.groups, 'mr_weight_kg'), 0)} kg (추정)</div></div>
+      <div class="tile"><div class="cap">초과 롤</div><div class="n">${sum(p.orders, 'extra')}</div><div class="p">정수량 기본, allow_extra 시만</div></div>
+    </div>
+    ${bad ? `<div class="err" style="display:block;margin-top:16px">미해결 품목: ${bad} — 유효폭보다 넓은 폭이거나 시간 제한 안에 못 풀었습니다.</div>` : ''}
+    <table><thead><tr><th>품목</th><th class="num">세트#</th><th>지시서 표기</th><th class="num">폭 합 / 유효폭</th><th class="num">로스 mm</th><th class="num">M/R 길이 m</th><th class="num">시간 h</th><th>주문별 롤수</th></tr></thead><tbody>${sets.join('')}</tbody></table>
+  </div>`;
+  if (s) {
+    const tr = Object.fromEntries((s.transitions || []).map(t => [t.to, t]));
+    const jobs = s.jobs.map(j => { const t = tr[j.job_id] || {}; return `<tr><td class="num">${j.sequence}</td><td class="mono">${esc(j.item)}</td><td><span class="badge">${esc(j.color_code)}</span></td><td class="num">${fmt(j.gsm, 0)}</td>
+      <td class="mono">(${esc(j.pattern)})*${j.length} ×${j.count}</td><td class="mono">${hhmm(j.start)}</td><td class="mono">${hhmm(j.end)}</td><td class="num">${t.delta_h ? fmt(t.delta_h, 2) : '<span class="dim">0</span>'}</td><td class="num">${t.cr_rolls || '<span class="dim">0</span>'}</td>
+      <td class="num">${j.tardiness_h ? '<b style="color:var(--err)">' + fmt(j.tardiness_h, 1) + '</b>' : '<span class="dim">0</span>'}</td></tr>`; }).join('');
+    head += `<div class="card"><h2>③ 생산 계획 — 2단 생산 순서 ${tag(s.status)}</h2>
+      <div class="tiles wide">
+        <div class="tile"><div class="cap">작업(세트 블록)</div><div class="n">${s.jobs.length}</div><div class="p">t0 ${hhmm(s.jobs[0] && s.jobs[0].start)}</div></div>
+        <div class="tile"><div class="cap">전환 손실</div><div class="n">${fmt(s.total_changeover_h, 2)}<span class="p"> h</span></div><div class="p">평량 상승 ${s.rise_count}회</div></div>
+        <div class="tile"><div class="cap">CR 중간제품</div><div class="n">${s.total_cr_rolls}<span class="p"> 롤</span></div><div class="p">블랙→화이트 전환분</div></div>
+        <div class="tile"><div class="cap">납기 지연</div><div class="n">${fmt(s.total_tardiness_h, 1)}<span class="p"> h</span></div><div class="p">완료 ${hhmm(s.makespan_end)}</div></div>
+      </div>
+      <table><thead><tr><th class="num">순번</th><th>품목</th><th>색상</th><th class="num">g/㎡</th><th>세트</th><th>시작</th><th>종료</th><th class="num">전환 h</th><th class="num">CR</th><th class="num">지연 h</th></tr></thead><tbody>${jobs}</tbody></table>
+    </div>`;
+  } else if (!bad) head += '<div class="card"><div class="empty">2단 순서는 1단이 전부 풀려야 계산합니다.</div></div>';
+  const warns = [...new Set([...(p.warnings || []), ...((s && s.warnings) || [])])];
+  head += `<div class="card"><h2>경고·가정</h2><ul class="warn">${warns.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>`;
+  $('optout').innerHTML = head;
+}
+saveCart();
 loadRules();
 </script>
 </body>
