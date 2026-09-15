@@ -41,30 +41,40 @@ DEFAULT_TRANSITION_RULES = {'color': {'same_h': 0,
            'estimated': True,
            'comments': {'same_h': '[추정] C-04: identical full color code',
                         'light_to_dark_h': '[추정] C-03: 40-60 minute midpoint, specified 0.83h',
-                        'dark_to_light_h': '[추정] C-01/C-02: 5-6 hour midpoint; other descending colors '
-                                           'also estimated',
+                        'dark_to_light_h': '[추정] C-01/C-02: 5-6 hour midpoint; other descending '
+                                           'colors also estimated',
                         'dark_to_light_cr_rolls': '[추정] C-02/C-05: 5-7 roll midpoint, BK->WH only',
                         'lightness_order': '[추정] 관측 계열의 추정 순서, 기준표 수령 시 교체 (C-01/C-04)'}},
  'weight': {'threshold_gsm': 30,
             'drop_h_per_gsm': 0.0375,
-            'rise_h_per_gsm': 0,
+            'rise_h_per_gsm': 0.005,
             'agri_switch_h': 1.0,
-            'anchor': '100g→30g 직행 = 1.5h (S-05 경험값 1~2h 중앙값)',
+            'anchor': '100g→30g 직행 = 1.5h (S-05 경험값 1~2h 중앙값); 상승 100g = 0.5h(상한)',
             'estimated': True,
             'comments': {'threshold_gsm': '[추정] S-05: natural cooling threshold, not a measured '
                                           'standard',
                          'drop_h_per_gsm': '[추정] S-05: 1.5h / (70g - 30g)',
-                         'rise_h_per_gsm': '[추정] S-04/S-06: no heating-time table; zero baseline',
+                         'rise_h_per_gsm': '[추정] S-04/S-06: heating time per gsm of rise; replaces '
+                                           'the former rise-count tie-break so the objective stays '
+                                           'provable (정식화 §11)',
                          'agri_switch_h': '[추정] S-07: no temperature-reset table',
-                         'anchor': '[추정] S-05: calibration example, not validated transition data'}},
+                         'rise_threshold_gsm': '[추정] S-04: any rise counts (0 g threshold); drops '
+                                               'keep threshold_gsm',
+                         'rise_cap_h': '[추정] S-01 guard: a single rise never costs more than this, '
+                                       'so weight ordering cannot outweigh colour grouping (0.5h < '
+                                       'light_to_dark_h 0.83h)',
+                         'anchor': '[추정] S-05/S-06: calibration examples, not validated transition '
+                                   'data'},
+            'rise_threshold_gsm': 0,
+            'rise_cap_h': 0.5},
  'cr_roll_kg': 100,
  'objective': {'urgent_weight': 10,
                'cr_minutes_per_roll': 60,
                'estimated': True,
                'comments': {'urgent_weight': '[추정] S-08/S-09: unspecified weight, configurable '
                                              'conservative baseline',
-                            'cr_minutes_per_roll': '[추정] C-02/C-05: unspecified kappa, configurable 1h '
-                                                   'per CR roll'}},
+                            'cr_minutes_per_roll': '[추정] C-02/C-05: unspecified kappa, '
+                                                   'configurable 1h per CR roll'}},
  'estimated': True,
  'comments': {'cr_roll_kg': '[추정] C-06: placeholder 100kg/roll; actual CR specification required'}}
 
@@ -135,11 +145,14 @@ def _transition(previous,current,rules):
     else: color_h=color["light_to_dark_h"]
     if a[:2]=="BK" and b[:2]=="WH": cr=color["dark_to_light_cr_rolls"]
     delta=previous["gsm"]-current["gsm"]
-    # [추정] S-05 convex cooling excess; S-04/S-06 heating defaults to zero.
-    weight_h=(weight["drop_h_per_gsm"] if delta>0 else weight["rise_h_per_gsm"])*max(0,abs(delta)-weight["threshold_gsm"])
-    if previous["agri"]!=current["agri"]: weight_h+=weight["agri_switch_h"]
-    hours=color_h+weight_h
-    return dict(delta_h=hours,scheduled_minutes=math.ceil(hours*60-1e-9),cr_rolls=cr,
+    # [추정] S-05: cooling loss only beyond threshold_gsm (convex). S-04/S-06: heating is a real
+    # cost (rise_h_per_gsm above rise_threshold_gsm, capped by rise_cap_h), not a tie-break term (§11).
+    drop_h=weight["drop_h_per_gsm"]*max(0,delta-weight["threshold_gsm"]) if delta>0 else 0.0
+    rise_h=min(weight["rise_h_per_gsm"]*max(0,-delta-weight["rise_threshold_gsm"]),weight["rise_cap_h"]) if delta<0 else 0.0
+    agri_h=weight["agri_switch_h"] if previous["agri"]!=current["agri"] else 0.0
+    hours=color_h+drop_h+rise_h+agri_h
+    return dict(delta_h=hours,color_h=color_h,drop_h=drop_h,rise_h=rise_h,agri_h=agri_h,
+                scheduled_minutes=math.ceil(hours*60-1e-9),cr_rolls=cr,
                 cr_kg=cr*rules["cr_roll_kg"],rise=int(delta<0),unknown_color=unknown)
 
 
@@ -179,15 +192,18 @@ def _solve_sequence(jobs,state,transitions,frozen,blocked,rules,*,time_limit):
         model.add_max_equality(t,[0,ends[i]-due]) if due is not None else model.add(t==0)
         tardiness.append(t)
     makespan=model.new_int_var(0,horizon,"makespan");model.add_max_equality(makespan,ends)
+    # Redundant but always valid on one machine with serial changeovers: the last job cannot end before
+    # all processing plus every selected changeover. It tightens the relaxation so the makespan term
+    # can be proven optimal (정식화 §11 권고 1). Revisit if machines are added or changeovers overlap.
+    model.add(makespan>=sum(j["duration_minutes"] for j in jobs)+sum(arcs[k]*t["scheduled_minutes"] for k,t in transitions.items()))
     costs={key:t["scheduled_minutes"]+rules["objective"]["cr_minutes_per_roll"]*t["cr_rolls"] for key,t in transitions.items()}
     max_cost=n*max(costs.values())
-    # Integer lexicographic domination: tardiness >> setup loss >> makespan >> rises.
-    w3=n+1
+    # Integer lexicographic domination: tardiness >> setup loss (incl. heating) >> makespan. No tie-break term.
+    w3=1
     w2=(horizon+1)*w3
     w1=(max_cost+1)*w2
     model.minimize(w1*sum(t*(rules["objective"]["urgent_weight"] if j["urgent"] else 1) for t,j in zip(tardiness,jobs))
-                   +w2*sum(arcs[k]*v for k,v in costs.items())+w3*makespan
-                   +sum(arcs[k]*t["rise"] for k,t in transitions.items()))
+                   +w2*sum(arcs[k]*v for k,v in costs.items())+w3*makespan)
     if model.validate(): raise ValueError("CP-SAT model integer range exceeded; shorten planning horizon")
     solver=cp_model.CpSolver();solver.parameters.max_time_in_seconds=time_limit
     status=solver.solve(model)
@@ -198,7 +214,7 @@ def _solve_sequence(jobs,state,transitions,frozen,blocked,rules,*,time_limit):
         order.append(node-1)
     return dict(status=solver.status_name(status),order=order,starts=[solver.value(s) for s in starts],
                 ends=[solver.value(e) for e in ends],objective_value=solver.objective_value,
-                objective_bound=solver.best_objective_bound)
+                objective_bound=solver.best_objective_bound,weights=dict(w1=w1,w2=w2,w3=w3))
 
 
 def _timeline(jobs,solution,transitions,t0,blocked):
@@ -232,8 +248,10 @@ def schedule(plan_result, *, t0, machine_state, frozen=(), blocked=(), rules_fil
     path=Path(rules_file) if rules_file is not None else Path(__file__).with_name("transition_rules.json")
     # Explicit paths fail visibly if missing; only absent adjacent JSON uses fallback.
     rules=json.loads(path.read_text()) if rules_file is not None or path.exists() else deepcopy(DEFAULT_TRANSITION_RULES)
+    if "weight" in rules:   # older rules files: heating keys default to the embedded values
+        for key in ("rise_h_per_gsm","rise_threshold_gsm","rise_cap_h"): rules["weight"].setdefault(key,DEFAULT_TRANSITION_RULES["weight"][key])
     for section,keys in (("color",("same_h","light_to_dark_h","dark_to_light_h","dark_to_light_cr_rolls")),
-                         ("weight",("threshold_gsm","drop_h_per_gsm","rise_h_per_gsm","agri_switch_h")),
+                         ("weight",("threshold_gsm","drop_h_per_gsm","rise_h_per_gsm","rise_threshold_gsm","rise_cap_h","agri_switch_h")),
                          ("objective",("urgent_weight","cr_minutes_per_roll"))):
         if section not in rules: raise ValueError("missing rules section")
         for key in keys: rules[section][key]=_finite(rules[section].get(key),key)
@@ -267,7 +285,7 @@ def schedule(plan_result, *, t0, machine_state, frozen=(), blocked=(), rules_fil
         else: merged.append((a,b))
     transitions={(i,j):_transition(state if i==0 else jobs[i-1],jobs[j-1],rules)
                  for i in range(len(jobs)+1) for j in range(1,len(jobs)+1) if i!=j}
-    warnings=list(plan_result.get("warnings",[]))+["[추정] C-01..C-06/S-04..S-07: transition coefficients",
+    warnings=list(plan_result.get("warnings",[]))+["[추정] C-01..C-06/S-04..S-07: transition coefficients (heating cost for gsm rises included)",
              "Transition/production intervals round up to integer minutes; delta_h retains raw estimates",
              "[추정] S-08/S-09/C-02: urgent weight and CR minute-equivalent are configurable assumptions"]
     unknown_families=sorted({j["color_code"][:2] for j in [state]+jobs if j["color_code"][:2] not in families})
@@ -280,7 +298,12 @@ def schedule(plan_result, *, t0, machine_state, frozen=(), blocked=(), rules_fil
     mb=defaultdict(float)
     for j in timeline:
         if j["mb_kg"] is not None: mb[j["color_code"]]+=j["mb_kg"]
+    weights=solution.get("weights"); obj,bound=solution.get("objective_value"),solution.get("objective_bound")
+    gap_minutes=None if not complete or not weights or obj is None else max(0.0,(obj-bound)/weights["w2"])
+    components={k:sum(t[k] for t in changes) for k in ("color_h","drop_h","rise_h","agri_h")} if complete else None
     return dict(jobs=timeline,transitions=changes,total_changeover_h=sum(t["delta_h"] for t in changes) if complete else None,
+                changeover_components_h=components,proven_optimal=solution["status"]=="OPTIMAL",
+                objective_value=obj,objective_bound=bound,gap_changeover_minutes=gap_minutes,
                 total_scheduled_changeover_minutes=sum(t["scheduled_minutes"] for t in changes) if complete else None,
                 total_cr_rolls=sum(t["cr_rolls"] for t in changes) if complete else None,
                 total_tardiness_h=sum(j["tardiness_h"] for j in timeline) if complete else None,

@@ -169,7 +169,7 @@
           <button class="btn" type="button" id="o_run">최적화 실행</button>
           <button class="btn ghost" type="button" id="o_clear">비우기</button>
         </div>
-        <div class="hint">장바구니의 생산의뢰분을 모아 1단(품목·길이별 슬리팅 세트, 총 길이 최소)과 2단(색상·중량·납기 순서, 전환 손실 최소)을 차례로 풉니다. 계수는 현장 기준표 수령 전 추정값이며 세트 구조는 구두 확인 전입니다.</div>
+        <div class="hint">장바구니의 생산의뢰분을 모아 1단(품목·길이별 슬리팅 세트, 총 길이 최소)과 2단(납기 지연 → 전환 손실(색상·평량 하강·가열·농업용) → 완료 시각 순서)을 차례로 풉니다. 2단이 시간 제한 안에 하한과 만나면 "최적 증명" 배지가 붙습니다. 계수는 현장 기준표 수령 전 추정값이며 세트 구조는 구두 확인 전입니다.</div>
       </div>
     </div>
     <div>
@@ -424,10 +424,13 @@ function renderOpt(r) {
     const jobs = s.jobs.map(j => { const t = tr[j.job_id] || {}; return `<tr><td class="num">${j.sequence}</td><td class="mono">${esc(j.item)}</td><td><span class="badge">${esc(j.color_code)}</span></td><td class="num">${fmt(j.gsm, 0)}</td>
       <td class="mono">(${esc(j.pattern)})*${j.length} ×${j.count}</td><td class="mono">${hhmm(j.start)}</td><td class="mono">${hhmm(j.end)}</td><td class="num">${t.delta_h ? fmt(t.delta_h, 2) : '<span class="dim">0</span>'}</td><td class="num">${t.cr_rolls || '<span class="dim">0</span>'}</td>
       <td class="num">${j.tardiness_h ? '<b style="color:var(--err)">' + fmt(j.tardiness_h, 1) + '</b>' : '<span class="dim">0</span>'}</td></tr>`; }).join('');
-    head += `<div class="card"><h2>③ 생산 계획 — 2단 생산 순서 ${tag(s.status)}</h2>
+    const comp = s.changeover_components_h || {}, proof = s.proven_optimal
+      ? '<span class="badge b-ok">최적 증명 · 모델·추정 계수 기준</span>'
+      : `<span class="badge b-temp">시간 제한 내 미증명 · 전환 손실 하한 대비 +${fmt(s.gap_changeover_minutes, 1)}분</span>`;
+    head += `<div class="card"><h2>③ 생산 계획 — 2단 생산 순서 ${tag(s.status)} ${proof}</h2>
       <div class="tiles wide">
         <div class="tile"><div class="cap">작업(세트 블록)</div><div class="n">${s.jobs.length}</div><div class="p">t0 ${hhmm(s.jobs[0] && s.jobs[0].start)}</div></div>
-        <div class="tile"><div class="cap">전환 손실</div><div class="n">${fmt(s.total_changeover_h, 2)}<span class="p"> h</span></div><div class="p">평량 상승 ${s.rise_count}회</div></div>
+        <div class="tile"><div class="cap">전환 손실 (가열 포함)</div><div class="n">${fmt(s.total_changeover_h, 2)}<span class="p"> h</span></div><div class="p">색상 ${fmt(comp.color_h, 2)} · 하강 ${fmt(comp.drop_h, 2)} · 상승 ${fmt(comp.rise_h, 2)} · 농업용 ${fmt(comp.agri_h, 2)} h · 상승 ${s.rise_count}회</div></div>
         <div class="tile"><div class="cap">CR 중간제품</div><div class="n">${s.total_cr_rolls}<span class="p"> 롤</span></div><div class="p">블랙→화이트 전환분</div></div>
         <div class="tile"><div class="cap">납기 지연</div><div class="n">${fmt(s.total_tardiness_h, 1)}<span class="p"> h</span></div><div class="p">완료 ${hhmm(s.makespan_end)}</div></div>
       </div>

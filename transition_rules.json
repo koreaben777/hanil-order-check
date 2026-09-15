@@ -41,17 +41,21 @@
   "weight": {
     "threshold_gsm": 30,
     "drop_h_per_gsm": 0.0375,
-    "rise_h_per_gsm": 0,
+    "rise_h_per_gsm": 0.005,
     "agri_switch_h": 1.0,
-    "anchor": "100g→30g 직행 = 1.5h (S-05 경험값 1~2h 중앙값)",
+    "anchor": "100g→30g 직행 = 1.5h (S-05 경험값 1~2h 중앙값); 상승 100g = 0.5h(상한)",
     "estimated": true,
     "comments": {
       "threshold_gsm": "[추정] S-05: natural cooling threshold, not a measured standard",
       "drop_h_per_gsm": "[추정] S-05: 1.5h / (70g - 30g)",
-      "rise_h_per_gsm": "[추정] S-04/S-06: no heating-time table; zero baseline",
+      "rise_h_per_gsm": "[추정] S-04/S-06: heating time per gsm of rise; replaces the former rise-count tie-break so the objective stays provable (정식화 §11)",
       "agri_switch_h": "[추정] S-07: no temperature-reset table",
-      "anchor": "[추정] S-05: calibration example, not validated transition data"
-    }
+      "rise_threshold_gsm": "[추정] S-04: any rise counts (0 g threshold); drops keep threshold_gsm",
+      "rise_cap_h": "[추정] S-01 guard: a single rise never costs more than this, so weight ordering cannot outweigh colour grouping (0.5h < light_to_dark_h 0.83h)",
+      "anchor": "[추정] S-05/S-06: calibration examples, not validated transition data"
+    },
+    "rise_threshold_gsm": 0,
+    "rise_cap_h": 0.5
   },
   "cr_roll_kg": 100,
   "objective": {

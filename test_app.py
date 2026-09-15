@@ -11,6 +11,7 @@ def test_optimize_cart():
     plan, sched = r["plan"], r["schedule"]
     assert plan["complete"] and sum(g["sets_used"] for g in plan["groups"] if g["item"] == "2TESTWH1N") == 9
     assert sched["complete"] and len(sched["jobs"]) == sum(len(g["sets"]) for g in plan["groups"])
+    assert sched["proven_optimal"] is True and sched["gap_changeover_minutes"] < 1 and set(sched["changeover_components_h"]) == {"color_h", "drop_h", "rise_h", "agri_h"}
     assert [j["color_code"] for j in sched["jobs"]][:1] == ["WH1N"]          # 연한색(설비 상태 WH1N) 먼저
     assert sched["jobs"][0]["start"] >= "2026-01-01T00:00:00"
     for bad in ({}, {"requests": []}, {"requests": cart, "time_limit": 0}, {"requests": cart, "time_limit": "x"}):

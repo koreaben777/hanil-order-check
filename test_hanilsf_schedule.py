@@ -207,6 +207,47 @@ def test_expanded_lightness_order():
     print('  expanded lightness: WH->NT->UV, changeover=2.66h, no unknown-family warning')
 
 
+def test_heating_cost_and_proof_fields():
+    # S-04/S-06: a rise costs heating time (0.005 h/g above 0 g, capped at 0.5 h); drops keep the 30 g threshold.
+    rules=json.loads(hs.Path(hs.__file__).with_name('transition_rules.json').read_text())
+    lo,hi=dict(color_code='WH1N',gsm=30,agri=False),dict(color_code='WH1N',gsm=60,agri=False)
+    up,down=hs._transition(lo,hi,rules),hs._transition(hi,lo,rules)
+    assert up['rise_h']==.15 and up['delta_h']==.15 and up['rise']==1 and down['delta_h']==0
+    assert hs._transition(dict(color_code='WH1N',gsm=15,agri=False),dict(color_code='WH1N',gsm=140,agri=False),rules)['rise_h']==.5
+    p=fixture([(100,'WH1N',{}),(30,'WH1N',{}),(60,'WH1N',{})])
+    r=verify(solve(p),p)
+    assert [j['gsm'] for j in r['jobs']]==[100,60,30] and r['proven_optimal'] is True and r['status']=='OPTIMAL'
+    assert r['gap_changeover_minutes']<1 and r['objective_bound']<=r['objective_value']
+    assert set(r['changeover_components_h'])=={'color_h','drop_h','rise_h','agri_h'}
+    assert math.isclose(sum(r['changeover_components_h'].values()),r['total_changeover_h'])
+    assert all(t['delta_h']==t['color_h']+t['drop_h']+t['rise_h']+t['agri_h'] for t in r['transitions'])
+    print('  heating: 30->60 rise=0.15h, 15->140 capped 0.5h, 60->30 drop=0; proof fields present, (a) still unique')
+
+
+def test_unavoidable_tardiness_still_proven():
+    # Two jobs due at t0 cannot both be on time; the solver must still close the bound.
+    p=fixture([(100,'WH1N',dict(due=T0)),(100,'WH1N',dict(due=T0)),(60,'BK1N',{})])
+    r=verify(solve(p),p)
+    assert r['status']=='OPTIMAL' and r['proven_optimal'] and r['total_tardiness_h']>0
+    assert r['jobs'][0]['color_code']=='WH1N'   # 같은 규격 두 주문은 1단에서 한 세트(2회)로 묶여 작업 하나가 된다
+    print(f"  tardiness: unavoidable {r['total_tardiness_h']}h, still OPTIMAL")
+
+
+def test_optional_examples_proven_optimal():
+    from pathlib import Path
+    path=Path(__file__).with_name('cart_examples.json')
+    if not path.exists():
+        print('  skip examples proof: cart_examples.json missing');return False
+    import time
+    exs={e['id']:e for e in json.loads(path.read_text())}
+    for exid in ('ex3','ex5'):
+        rows=[dict(r,order_id=f'E{i}') for i,r in enumerate(exs[exid]['rows'],1)]
+        plan=hp.plan(rows,time_limit=20)
+        t=time.time();r=hs.schedule(plan,t0=T0,machine_state=STATE,time_limit=120);el=time.time()-t
+        assert r['complete'] and r['proven_optimal'],f'{exid} not proven within 120s'
+        print(f"  {exid}: {len(r['jobs'])} jobs proven OPTIMAL in {el:.1f}s, changeover={r['total_changeover_h']:.2f}h gap={r['gap_changeover_minutes']:.3f}min")
+
+
 if __name__=='__main__':
     for name,fn in list(globals().items()):
         if name.startswith('test_'):
